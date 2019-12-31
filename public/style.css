@@ -1,0 +1,36 @@
+body {
+    background-color: lightgrey;
+    font-family:sans-serif;
+    margin:0px;
+    padding:0px;
+}
+footer {
+    background-color: lightgrey;
+    padding:10px 10px 10px 10px;
+}
+ol {
+    font-family:monospace;
+}
+pre {
+    margin:0;
+}
+a:link { text-decoration:none; color:navy}
+a:visited { text-decoration:none; color:navy }
+a:hover { background-color:yellow; color:black; }
+a:active { background-color:yellow; color:black; }
+.head {
+    background-color: lightgrey;
+    padding:10px 10px 10px 10px;
+}
+.body {
+    background-color: white;
+    padding:10px 10px 30px 30px;
+}
+.flex-container {
+    display: flex;
+}
+h1 {
+    margin:0;
+    padding-top:5px;
+    padding-bottom:10px;
+}
