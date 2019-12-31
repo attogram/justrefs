@@ -1,0 +1,14 @@
+{
+    "name": "attogram/justrefs",
+    "description": "Just Refs",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "attogram/router": "^4.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Raw\\": "src/"
+        }
+    }
+}
