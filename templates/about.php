@@ -1,4 +1,4 @@
-<h1>Welcome to <b><?= $this->config['name'] ?></b></h1>
+<h1>Welcome to <b><?= $this->config['name'] ?></b> v<?= self::VERSION ?></h1>
 <p>
     The goal of this
     <a href="../r/Website">website</a>
