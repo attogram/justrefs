@@ -19,7 +19,7 @@
     <a href="../r/Prose">prose</a> written by others,
     and allows you to concentrate exclusively on
     <a href="../r/Judgement">judging</a>
-    the quality the
+    the quality of the
     <a href="../r/Reference">references</a>.
 </p>
 <p>

@@ -4,7 +4,7 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^ index.php [L]
 
-AuthUserFile \xampp\htdocs\justrefs\public\.htpasswd
-AuthType Basic
-AuthName "beta test"
-Require valid-user
+#AuthUserFile \xampp\htdocs\justrefs\public\.htpasswd
+#AuthType Basic
+#AuthName "beta test"
+#Require valid-user
