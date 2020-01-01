@@ -1,95 +1,54 @@
 <?php
-/**
- * Raw Wiki
- */
 declare(strict_types = 1);
 
-namespace Raw;
+namespace Attogram\Justrefs;
 
-class Wiki
+class Web
 {
-    const VERSION = '0.0.1';
+    const VERSION = '0.0.2';
 
     public $verbose = false;
 
     private $config = [];
     private $router;
+    private $filesystem;
     private $query = false;
-    private $filename = false;
     private $data = false;
     private $title = false;
 
     /**
      * @param bool $verbose (optional, default: false)
-     * @sets $this->router
-     * @sets $this->config
-     * @sets $this->verbose
      */
     public function __construct($verbose = false)
     {
-        $this->router = new \Attogram\Router\Router();
+
         $this->config['name'] = 'Just Refs';
         $this->config['cache'] = '..' . DIRECTORY_SEPARATOR . 'cache';
-        $this->config['api'] = 'https://en.wikipedia.org/w/api.php?action=parse&prop=externallinks|links&format=json&page=';
-        // &curtimestamp=1
-        // &redirects=1
-        // http://en.citizendium.org/api.php?action=parse&prop=externallinks|links&format=json&page=
+        //$this->config['api'] = 'https://en.wikipedia.org/w/api.php?action=parse&prop=externallinks|links&format=json&page=';
 
         if ($verbose) {
             $this->verbose = true;
         }
         $this->verbose(get_class($this) . ' v' . self::VERSION);
+
+        $this->filesystem = new Filesystem();
+        $this->filesystem->verbose = $this->verbose;
     }
 
-    /**
-     * @return void
-     */
     public function route()
     {
+        $this->router = new \Attogram\Router\Router();
         $this->router->allow('/', 'home');
         $this->router->allow('/r/?', 'topic');
         $this->router->allow('/r/?/?', 'topic');
         $this->router->allow('/r/?/?/?', 'topic');
         $this->router->allow('/about', 'about');
         $control = $this->router->match();
-        $this->verbose("route: control: $control");
+        //$this->verbose("route: control: $control");
         if (!$control || !method_exists($this, $control)) {
             $this->error404('Page Not Found');
         }
         $this->{$control}();
-    }
-
-    /**
-     * @return void
-     * @sets $this->query
-     */
-    private function home()
-    {
-        $this->query = $this->router->getGet('q');
-
-        if (empty($this->query)) {
-            $this->htmlHeader();
-            include('../templates/home.php');
-            $this->htmlFooter();
-
-            return;
-        }
-
-        if (!$this->getFilename()) {
-            $this->filename = $this->getDataFromApi();
-        }
-
-        if (!$this->filename) {
-            header('HTTP/1.0 404 Not Found');
-            $this->htmlHeader();
-            include('../templates/home.php');
-            print '<p>0 Results</p>';
-            $this->htmlFooter();
-
-            return;
-        }
-
-        $this->router->redirect($this->getLink());
     }
 
     private function about()
@@ -100,10 +59,35 @@ class Wiki
         $this->htmlFooter();
     }
 
-    /**
-     * @return void
-     * @sets $this->query
-     */
+    private function home()
+    {
+        $this->query = $this->router->getGet('q');
+        if (!is_string($this->query) || !strlen($this->query)) {
+            $this->htmlHeader();
+            include('../templates/home.php');
+            $this->htmlFooter();
+            return;
+        }
+        $mediaWiki = new MediaWiki();
+        $mediaWiki->verbose = $this->verbose;
+        $results = $mediaWiki->search($this->query);
+        if (!$results || !is_array($results)) {
+            header('HTTP/1.0 404 Not Found');
+            $this->htmlHeader();
+            include('../templates/home.php');
+            print '<p>0 Results</p>';
+            $this->htmlFooter();
+            return;
+        }
+        $this->htmlHeader();
+        print '<b>' . count($results) . '</b> results<ol>';
+        foreach ($results as $result) {
+            print '<li><a href="r/' . urlencode($result) . '">' . $result . '</a></li>';
+        }
+        print '</ol>';
+        $this->htmlFooter();
+    }
+
     private function topic()
     {
         $this->query = $this->router->getVar(0);
@@ -116,20 +100,16 @@ class Wiki
                 }
             }
         }
-
         $this->query = trim($this->query);
         $this->query = str_replace('_', ' ', $this->query);
         $this->query = urldecode($this->query);
         $this->verbose('topic: query: ' . $this->query);
-
-        if (!$this->query) {
+        if (!strlen($this->query)) {
             $this->error404('Not Found');
         }
-
         if (!$this->getData()) {
             $this->error404('Topic Not Found');
         }
-
         $this->topicPage();
     }
 
@@ -143,11 +123,8 @@ class Wiki
         $links = $this->data['parse']['links'];
         $exernalLinks = $this->data['parse']['externallinks'];
         $name = $this->data['parse']['title'];
-
         print '<h1>' . $name . '</h1>';
-
         print '<div class="flex-container">';
-
         print '<div>Topics:<ol>';
         foreach ($links as $link) {
             if ($link['ns'] == '0') {
@@ -157,17 +134,20 @@ class Wiki
             }
         }
         print '</ol></div>';
-
         print '<div>Links:<ol>';
         foreach ($exernalLinks as $link) {
             print '<li><a href="' . $link . '" target="_blank">' . $link . '</a></li>';
         }
         $wikipediaUrl = 'https://en.wikipedia.org/wiki/' . urlencode($name);
         $wikipediaUrl = str_replace('+', '_', $wikipediaUrl);
-        print '<li><a href="' . $wikipediaUrl . '" target="_blank">' . $wikipediaUrl . '</a></li>';
-        print '</ol></div>';
-
-        print '</div>';
+        print '</ol></div></div>';
+        print '<small>extracted from  &lt;'
+            . '<a href="' . $wikipediaUrl . '" target="_blank">' 
+            . $wikipediaUrl . '</a>&gt; released under the '
+            //. '<a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">'
+            . 'Creative Commons Attribution-Share-Alike License 3.0'
+            //. '</a>'
+            . '</small>';
 
         $this->htmlFooter();
     }
@@ -182,51 +162,7 @@ class Wiki
         }
         $page = str_replace(' ', '_', $query);
         $page = urlencode($page);
-
         return $this->router->getHome() . 'r/' . $page;
-    }
-
-    /**
-     * @param string $this->query
-     * @return string
-     */
-    private function buildFilename()
-    {
-        return $this->config['cache'] . DIRECTORY_SEPARATOR . md5($this->query) . '.json';
-    }
-
-    /**
-     * @param string $this->query
-     * @return bool
-     * @sets $this->filename
-     * @sets $this->title
-     */
-    private function getFilename()
-    {
-        // raw query
-        $this->title = $this->query;
-        $this->filename = $this->buildFilename($this->title);
-        if (is_readable($this->filename)) {
-
-            return true;
-        }
-        // Uppercase-first-letter of first word only
-        $this->title = ucfirst(strtolower($this->query));
-        $this->filename = $this->buildFilename($this->title);
-        if (is_readable($this->filename)) {
-            return true;
-        }
-        // Upper-case-first-letter of all words
-        $this->title = ucwords(strtolower($this->query));
-        $this->filename = $this->buildFilename($this->title);
-        if (is_readable($this->filename)) {
-            return true;
-        }
-    
-        $this->title = false;
-        $this->filename = false;
-
-        return false;
     }
 
     /**
@@ -235,33 +171,25 @@ class Wiki
      */
     private function getData()
     {
-
-        $this->verbose("getData: query: {$this->query}");
-
-        if (!$this->getFilename()) {
+        $this->verbose('getData: query: ' . $this->query);
+        if (!$this->filesystem->exists($this->query)) {
+            $this->verbose('getData: file not found');
             if (!$this->getDataFromApi()) {
-                $this->verbose('getData: no data found');
+                $this->verbose('getData: no data from api');
                 return false;
             }
         }
-
-        $this->verbose("getData: filename: {$this->filename}");
-
-        $cached = @file_get_contents($this->filename);
-
+        $cached = $this->filesystem->get($this->query);
         if (empty($cached) || !is_string($cached)) {
-            $this->verbose('getData: file_get_contents failed');
+            $this->verbose('getData: file get failed');
             return false;
         }
-    
         $this->data = @json_decode($cached, true);
-
         if (empty($this->data) || !is_array($this->data)) {
             $this->data = false;
             $this->verbose('getData: json_decode failed');
             return false;
         }
-
         $this->verbose('getData: data.count: ' . count($this->data));
         return true;
     }
@@ -269,57 +197,27 @@ class Wiki
     /**
      * @param string $this->query
      * @return bool
-     * @sets $this->filename
      * @sets $this->title
      */
     private function getDataFromApi()
     {
-        //$this->verbose("getDataFromApi($this->query)");
-
+        $this->verbose('getDataFromApi: query: ' . $this->query);
         $page = str_replace(' ', '%20', $this->query);
 
-        $url = $this->config['api'] . $page;
-
-        $this->verbose("getDataFromApi: $url");
-
-        $jsonData = file_get_contents($url);
-        if (empty($jsonData)) {
-            $this->verbose('getDataFromApi: file get failed');
+        $mediaWiki = new MediaWiki();
+        $mediaWiki->verbose = $this->verbose;
+        $data = $mediaWiki->links($this->query);
+        if (empty($data)) {
+            $this->verbose('getDataFromApi: false: no data');
             return false;
         }
-
-        $array = @json_decode($jsonData, true);
-
-        if (empty($array) || !is_array($array)) {
-            $this->verbose('getDataFromApi: decode failed');
-            return false;
+        $this->title = $data['parse']['title'];
+        $this->verbose('getDataFromApi: title: ' . $this->title);
+        if ($this->filesystem->set($this->title, json_encode($data))) {
+            return true;
         }
-
-        if (empty($array['parse'])
-            || empty($array['parse']['title'])
-            || !isset($array['parse']['links'])
-            || !is_array($array['parse']['links'])
-            || !isset($array['parse']['externallinks'])
-            || !is_array($array['parse']['externallinks'])
-        ) {
-            $this->verbose('getDataFromApi: missing elements');
-            return false;
-        }
-
-        $this->filename = $this->buildFilename($array['parse']['title']);
-        $this->title = $array['parse']['title'];
-
-        $this->verbose('getDataFromApi: title: ' . $this->title . ' filename: ' . $this->filename);
-
-        $bytes = file_put_contents($this->filename, $jsonData);
-        if (!$bytes) {
-            $this-verbose('getDataFromApi: file put failed');
-            return false;
-        }
-
-        $this->verbose("getDataFromApi: wrote: $bytes bytes");
-
-        return true;
+        $this->verbose('getDataFromApi: filesystem set failed');
+        return false;
     }
 
     /**
@@ -342,7 +240,7 @@ class Wiki
     private function verbose($message)
     {
         if ($this->verbose) {
-            print '<pre>' . gmdate('Y-m-d H:i:s') . ': ' . htmlentities(print_r($message, true)) . '</pre>';
+            print '<pre>' . gmdate('Y-m-d H:i:s') . ': Wiki: ' . htmlentities(print_r($message, true)) . '</pre>';
         }
     }
 
@@ -392,4 +290,3 @@ class Wiki
         return '<a href="' . $this->router->getHome() . '">' . $this->config['name'] . '</a>';
     }
 }
-

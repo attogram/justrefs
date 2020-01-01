@@ -1,14 +1,11 @@
 <?php
-/**
- * Raw Filesystem
- */
 declare(strict_types = 1);
 
-namespace Raw;
+namespace Attogram\Justrefs;
 
 class Filesystem
 {
-    const VERSION = '0.0.1';
+    const VERSION = '0.0.2';
 
     /** @var bool $verbose */
     public $verbose = false;
@@ -108,17 +105,17 @@ class Filesystem
         }
 
         $this->verbose("set: OK: name: $name bytes: $bytes  path: $path");
-        return false;
+        return true;
     }
     
     /**
-     * @param mixed $message (otional, default empty string)
+     * @param string $message
      * @return void
      */
-    public function verbose($message = '')
+    private function verbose($message)
     {
         if ($this->verbose) {
-            print gmdate('Y-m-d H:i:s') . ': ' . htmlentities(print_r($message, true)) . "\n";
+            print '<pre>' . gmdate('Y-m-d H:i:s') . ': Filesystem: ' . htmlentities(print_r($message, true)) . '</pre>';
         }
     }
 
@@ -134,13 +131,14 @@ class Filesystem
             $this->verbose('getPath: ERROR: md5 failed');
             return '';
         }
-        $first = substr($md5, 0, 2);
-        if (empty($first)) {
+        //$this->verbose('getPath: md5: ' . $md5);
+        $first = substr($md5, 0, 1);
+        if (!strlen($first)) {
             $this->verbose('getPath: ERROR: extract first failed');
             return '';
         }
-        $second = substr($md5, 2, 2);
-        if (empty($second)) {
+        $second = substr($md5, 1, 2);
+        if (!strlen($second) == 2) {
             $this->verbose('getPath: ERROR: extract second failed');
             return '';
         }

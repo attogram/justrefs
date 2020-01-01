@@ -1,0 +1,63 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "4c596117008e8bb33b7bd8e0ff75f075",
+    "packages": [
+        {
+            "name": "attogram/router",
+            "version": "v4.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/attogram/router.git",
+                "reference": "1d0ef41801f49b4e3f6ecf8d52438129fe82dda9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/attogram/router/zipball/1d0ef41801f49b4e3f6ecf8d52438129fe82dda9",
+                "reference": "1d0ef41801f49b4e3f6ecf8d52438129fe82dda9",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Attogram\\Router\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Attogram Project",
+                    "homepage": "https://github.com/attogram",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Attogram Router for PHP 7 - small, flexible, and surprisingly powerful",
+            "homepage": "https://github.com/attogram/router",
+            "keywords": [
+                "One class",
+                "php 7",
+                "router"
+            ],
+            "time": "2019-04-07T17:59:05+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {
+        "lib-curl": "*"
+    },
+    "platform-dev": []
+}

@@ -4,11 +4,12 @@
     "type": "project",
     "license": "proprietary",
     "require": {
+        "lib-curl": "*",
         "attogram/router": "^4.1"
     },
     "autoload": {
         "psr-4": {
-            "Raw\\": "src/"
+            "Attogram\\Justrefs\\": "src/"
         }
     }
 }

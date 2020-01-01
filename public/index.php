@@ -1,24 +1,17 @@
 <?php
-use function Functional\true;
-use function Functional\false;
-
-/**
- * Raw Wiki - Main Index Page
- */
 $verbose = false;
 
 $vendor = '../vendor/autoload.php';
-
 if (!is_readable($vendor)) {
     exit('Site down for maintenance');
 }
-
 require_once($vendor);
-
-if (!class_exists('\Attogram\Router\Router') || !class_exists('\Raw\Wiki')) {
+if (!class_exists('\Attogram\Router\Router')
+    || !class_exists('\Attogram\Justrefs\Web')
+    || !class_exists('\Attogram\Justrefs\Filesystem')
+    || !class_exists('\Attogram\Justrefs\Mediawiki')
+) {
     exit('Site down for maintenance.');
 }
-
-$raw = new \Raw\Wiki($verbose);
-
-$raw->route();
+$jr = new \Attogram\Justrefs\Web($verbose);
+$jr->route();
