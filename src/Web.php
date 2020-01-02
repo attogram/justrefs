@@ -188,6 +188,7 @@ class Web extends Base
 
         // build array of templates
         $templates = [];
+        $cachedTemplates = [];
         foreach ($data['templates'] as $template) {
             if ($template['ns'] == '10') {
                 $templates[] = $template['*'];
@@ -197,6 +198,7 @@ class Web extends Base
                 $templateData = @json_decode($templateJson, true);
                 //$this->verbose($templateData);
                 if (!empty($templateData['topics']) && is_array($templateData['topics'])) {
+                    $cachedTemplates[] = $template['*'];
                     foreach ($templateData['topics'] as $exTopic) {
                         if ($exTopic['ns'] == '0') {
                             // remove this template topic from master topic list
@@ -221,13 +223,15 @@ class Web extends Base
         // display
         print '<h1>' . $data['title'] . '</h1>';
         print '<div class="flex-container">';
-        print '<div class="topics"><small>Related Topics:</small><ol>';
+        print '<div class="topics">'
+            . '<small><b>' . count($topics) . '</b> Related Topics:</small><ol>';
         foreach ($topics as $topic) {
             print '<li><a href="' . $this->getLink($topic) . '">' . $topic . '</a></li>';
         }
         print '</ol></div>';
 
-        print '<div class="refs"><small>Reference Links:</small><ol>';
+        print '<div class="refs">'
+            . '<small><b>' . count($refs) . '</b> Reference Links:</small><ol>';
         foreach ($refs as $ref) {
             print '<li><a href="' . $ref . '" target="_blank">' . $ref . '</a></li>';
         }
@@ -236,9 +240,13 @@ class Web extends Base
         print '</ol></div></div>';
 
 
-        print '<hr /><small>Included Templates:</small><ol>';
+        print '<hr /><small><b>' . count($templates) . '</b> Included Templates:</small><ol>';
         foreach ($templates as $template) {
-            print '<li><a href="' . $this->getLink($template) . '">' . $template . '</a></li>';
+            $class = in_array($template, $cachedTemplates)
+                ? 'cached'
+                : 'missing';
+            print '<li><a href="' . $this->getLink($template) . '" class="' . $class 
+                . '">' . $template . '</a></li>';
         }
         print '</ol>';
 

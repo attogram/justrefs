@@ -21,6 +21,9 @@ a:link { text-decoration:none; color:navy}
 a:visited { text-decoration:none; color:navy }
 a:hover { background-color:yellow; color:black; }
 a:active { background-color:yellow; color:black; }
+a.missing {
+    color:red;
+}
 .head {
     background-color: lightgrey;
     padding:10px 10px 10px 10px;
