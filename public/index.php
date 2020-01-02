@@ -1,5 +1,5 @@
 <?php
-$verbose = false;
+$verbose = true;
 
 $vendor = '../vendor/autoload.php';
 if (!is_readable($vendor)) {
@@ -13,5 +13,6 @@ if (!class_exists('\Attogram\Router\Router')
 ) {
     exit('Site down for maintenance.');
 }
-$jr = new \Attogram\Justrefs\Web($verbose);
+$jr = new \Attogram\Justrefs\Web();
+$jr->verbose = $verbose;
 $jr->route();

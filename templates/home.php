@@ -13,5 +13,5 @@ foreach ($menus as $menu) {
 print '<br /><br />'
     . '<form>'
     . '<input name="q" value="" type="text" size="30">'
-    . '<input type="submit" value="   search  ">'
+    . '<input type="submit" value="   search   ">'
     . '</form>';

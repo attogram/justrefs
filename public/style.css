@@ -32,8 +32,18 @@ a:active { background-color:yellow; color:black; }
 .flex-container {
     display: flex;
 }
+.topics {
+    padding-right: 10px;
+    border-right: 1px solid grey;
+}
+.refs {
+    padding-left: 10px;
+}
 h1 {
     margin:0;
     padding-top:5px;
     padding-bottom:10px;
+}
+hr {
+    border-top: 1px dotted lightgrey;
 }

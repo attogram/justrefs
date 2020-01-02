@@ -3,40 +3,17 @@ declare(strict_types = 1);
 
 namespace Attogram\Justrefs;
 
-class Web
+class Web extends Base
 {
-    const VERSION = '0.0.2';
-
-    public $verbose = false;
-
-    private $config = [];
-    private $router;
+    private $data = [];
     private $filesystem;
-    private $query = false;
-    private $data = false;
-    private $title = false;
-
-    /**
-     * @param bool $verbose (optional, default: false)
-     */
-    public function __construct($verbose = false)
-    {
-
-        $this->config['name'] = 'Just Refs';
-        $this->config['cache'] = '..' . DIRECTORY_SEPARATOR . 'cache';
-        //$this->config['api'] = 'https://en.wikipedia.org/w/api.php?action=parse&prop=externallinks|links&format=json&page=';
-
-        if ($verbose) {
-            $this->verbose = true;
-        }
-        $this->verbose(get_class($this) . ' v' . self::VERSION);
-
-        $this->filesystem = new Filesystem();
-        $this->filesystem->verbose = $this->verbose;
-    }
+    private $router;
+    private $query = '';
+    private $title = '';
 
     public function route()
     {
+        $this->startTimer('page');
         $this->router = new \Attogram\Router\Router();
         $this->router->allow('/', 'home');
         $this->router->allow('/r/?', 'topic');
@@ -44,7 +21,6 @@ class Web
         $this->router->allow('/r/?/?/?', 'topic');
         $this->router->allow('/about', 'about');
         $control = $this->router->match();
-        //$this->verbose("route: control: $control");
         if (!$control || !method_exists($this, $control)) {
             $this->error404('Page Not Found');
         }
@@ -61,28 +37,64 @@ class Web
 
     private function home()
     {
+        // get search query
         $this->query = $this->router->getGet('q');
-        if (!is_string($this->query) || !strlen($this->query)) {
+
+        // No search query, show homepage
+        if (!is_string($this->query) || !strlen(trim($this->query))) {
             $this->htmlHeader();
             include('../templates/home.php');
             $this->htmlFooter();
             return;
         }
+
+        // format search query
+        $this->query = trim($this->query);
+
+        // are search results in cache?
+        $this->filesystem = new Filesystem();
+        $this->filesystem->verbose = $this->verbose;
+        $filename = 'search:' . mb_strtolower($this->query);
+        $results = $this->filesystem->get($filename);
+        if ($results) {
+            // get cached results
+            $data = @json_decode($results, true);
+            if (is_array($data)) {
+                // show cached results
+                $this->searchResults($data);
+                return;
+            }
+        }
+
+        // get search results from API
         $mediaWiki = new MediaWiki();
         $mediaWiki->verbose = $this->verbose;
         $results = $mediaWiki->search($this->query);
-        if (!$results || !is_array($results)) {
-            header('HTTP/1.0 404 Not Found');
-            $this->htmlHeader();
-            include('../templates/home.php');
-            print '<p>0 Results</p>';
-            $this->htmlFooter();
+        if ($results) {
+            // save results to cache
+            $this->filesystem->set($filename, json_encode($results));
+            // show api results
+            $this->searchResults($results);
             return;
         }
+
+        // no search results
+        //header('HTTP/1.0 404 Not Found');
         $this->htmlHeader();
-        print '<b>' . count($results) . '</b> results<ol>';
-        foreach ($results as $result) {
-            print '<li><a href="r/' . urlencode($result) . '">' . $result . '</a></li>';
+        include('../templates/home.php');
+        print '<b>0</b> results';
+        $this->htmlFooter();
+    }
+
+    /**
+     * @param array $data
+     */
+    private function searchResults($data)
+    {
+        $this->htmlHeader();
+        print '<b>' . count($data) . '</b> results<ol>';
+        foreach ($data as $topic) {
+            print '<li><a href="r/' . urlencode($topic) . '">' . $topic . '</a></li>';
         }
         print '</ol>';
         $this->htmlFooter();
@@ -90,6 +102,7 @@ class Web
 
     private function topic()
     {
+        // get topic query from url
         $this->query = $this->router->getVar(0);
         if ($this->router->getVar(1)) {
             $this->query .= '/' . $this->router->getVar(1);
@@ -100,48 +113,136 @@ class Web
                 }
             }
         }
+        // format topic query
         $this->query = trim($this->query);
         $this->query = str_replace('_', ' ', $this->query);
         $this->query = urldecode($this->query);
-        $this->verbose('topic: query: ' . $this->query);
+
         if (!strlen($this->query)) {
             $this->error404('Not Found');
         }
-        if (!$this->getData()) {
-            $this->error404('Topic Not Found');
+
+        // is topic in cache?
+        $this->filesystem = new Filesystem();
+        $this->filesystem->verbose = $this->verbose;
+        $results = $this->filesystem->get($this->query);
+        if ($results) {
+            // get cached results
+            $data = @json_decode($results, true);
+            if (is_array($data)) {
+                // show cached results
+                $this->topicPage($data);
+                return;
+            }
         }
-        $this->topicPage();
+
+        // get topic from API
+        $mediaWiki = new MediaWiki();
+        $mediaWiki->verbose = $this->verbose;
+        $data = $mediaWiki->links($this->query);
+        if ($data) {
+            // save results to cache
+            $this->filesystem->set($this->query, json_encode($data));
+            // show api results
+            $this->topicPage($data);
+            return;
+        }
+
+        $this->error404('Topic Not Found');
     }
 
     /**
-     * @return void
+     * @param array $data
      */
-    private function topicPage()
+    private function topicPage($data)
     {
-        $this->verbose('topicPage: count.data: ' . count($this->data));
+        $this->verbose('topicPage: data.title: ' . $data['title']);
+        $this->verbose('topicPage: count.data.topics: ' . count($data['topics']));
+        $this->verbose('topicPage: count.data.refs: ' . count($data['refs']));
+        $this->verbose('topicPage: count.data.templates: ' . count($data['templates']));
         $this->htmlHeader();
-        $links = $this->data['parse']['links'];
-        $exernalLinks = $this->data['parse']['externallinks'];
-        $name = $this->data['parse']['title'];
-        print '<h1>' . $name . '</h1>';
-        print '<div class="flex-container">';
-        print '<div>Topics:<ol>';
-        foreach ($links as $link) {
-            if ($link['ns'] == '0') {
-                print '<li><a href="' 
-                    . $this->getLink($link['*']) . '">' 
-                    . $link['*'] . '</a></li>';
+
+
+        // build array of related topics, mainspace topics only
+        $topics = [];
+        foreach ($data['topics'] as $topic) {
+            if ($topic['ns'] == '0') {
+                $topics[$topic['*']] = $topic['*'];
             }
         }
-        print '</ol></div>';
-        print '<div>Links:<ol>';
-        foreach ($exernalLinks as $link) {
-            print '<li><a href="' . $link . '" target="_blank">' . $link . '</a></li>';
+        // sort alphabetically
+        sort($topics);
+        $this->verbose('topicPage: count.topics: ' . count($topics));
+
+        // build array of reference links
+        $refs = [];
+        foreach ($data['refs'] as $ref) {
+            if (substr($ref, 0, 2) == '//') {
+                $ref = 'https:' . $ref;
+            }
+            $refs[] = $ref;
         }
-        $wikipediaUrl = 'https://en.wikipedia.org/wiki/' . urlencode($name);
+        // sort alphabetically
+        sort($refs);
+        $this->verbose('topicPage: count.refs: ' . count($refs));
+
+        // build array of templates
+        $templates = [];
+        foreach ($data['templates'] as $template) {
+            if ($template['ns'] == '10') {
+                $templates[] = $template['*'];
+
+                // is template cached?
+                $templateJson = $this->filesystem->get($template['*']);
+                $templateData = @json_decode($templateJson, true);
+                //$this->verbose($templateData);
+                if (!empty($templateData['topics']) && is_array($templateData['topics'])) {
+                    foreach ($templateData['topics'] as $exTopic) {
+                        if ($exTopic['ns'] == '0') {
+                            // remove this template topic from master topic list
+                            if (in_array($exTopic['*'], $topics)) {
+                                unset(
+                                    $topics[
+                                        array_search($exTopic['*'], $topics)
+                                    ]
+                                );
+                                $this->verbose('unset topic: ' . $exTopic['*']);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // sort alphabetically
+        sort($templates);
+        $this->verbose('topicPage: count.templates: ' . count($templates));
+        $this->verbose('topicPage: count.topics: ' . count($topics));
+
+        // display
+        print '<h1>' . $data['title'] . '</h1>';
+        print '<div class="flex-container">';
+        print '<div class="topics"><small>Related Topics:</small><ol>';
+        foreach ($topics as $topic) {
+            print '<li><a href="' . $this->getLink($topic) . '">' . $topic . '</a></li>';
+        }
+        print '</ol></div>';
+
+        print '<div class="refs"><small>Reference Links:</small><ol>';
+        foreach ($refs as $ref) {
+            print '<li><a href="' . $ref . '" target="_blank">' . $ref . '</a></li>';
+        }
+        $wikipediaUrl = 'https://en.wikipedia.org/wiki/' . urlencode($data['title']);
         $wikipediaUrl = str_replace('+', '_', $wikipediaUrl);
         print '</ol></div></div>';
-        print '<small>extracted from  &lt;'
+
+
+        print '<hr /><small>Included Templates:</small><ol>';
+        foreach ($templates as $template) {
+            print '<li><a href="' . $this->getLink($template) . '">' . $template . '</a></li>';
+        }
+        print '</ol>';
+
+        print '<hr /><small>extracted from  &lt;'
             . '<a href="' . $wikipediaUrl . '" target="_blank">' 
             . $wikipediaUrl . '</a>&gt; released under the '
             //. '<a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">'
@@ -166,61 +267,6 @@ class Web
     }
 
     /**
-     * @return bool
-     * @sets $this->data
-     */
-    private function getData()
-    {
-        $this->verbose('getData: query: ' . $this->query);
-        if (!$this->filesystem->exists($this->query)) {
-            $this->verbose('getData: file not found');
-            if (!$this->getDataFromApi()) {
-                $this->verbose('getData: no data from api');
-                return false;
-            }
-        }
-        $cached = $this->filesystem->get($this->query);
-        if (empty($cached) || !is_string($cached)) {
-            $this->verbose('getData: file get failed');
-            return false;
-        }
-        $this->data = @json_decode($cached, true);
-        if (empty($this->data) || !is_array($this->data)) {
-            $this->data = false;
-            $this->verbose('getData: json_decode failed');
-            return false;
-        }
-        $this->verbose('getData: data.count: ' . count($this->data));
-        return true;
-    }
-
-    /**
-     * @param string $this->query
-     * @return bool
-     * @sets $this->title
-     */
-    private function getDataFromApi()
-    {
-        $this->verbose('getDataFromApi: query: ' . $this->query);
-        $page = str_replace(' ', '%20', $this->query);
-
-        $mediaWiki = new MediaWiki();
-        $mediaWiki->verbose = $this->verbose;
-        $data = $mediaWiki->links($this->query);
-        if (empty($data)) {
-            $this->verbose('getDataFromApi: false: no data');
-            return false;
-        }
-        $this->title = $data['parse']['title'];
-        $this->verbose('getDataFromApi: title: ' . $this->title);
-        if ($this->filesystem->set($this->title, json_encode($data))) {
-            return true;
-        }
-        $this->verbose('getDataFromApi: filesystem set failed');
-        return false;
-    }
-
-    /**
      * @param string $message
      * @return void
      */
@@ -234,26 +280,12 @@ class Web
     }
 
     /**
-     * @param string $message
-     * @return void
-     */
-    private function verbose($message)
-    {
-        if ($this->verbose) {
-            print '<pre>' . gmdate('Y-m-d H:i:s') . ': Wiki: ' . htmlentities(print_r($message, true)) . '</pre>';
-        }
-    }
-
-    /**
      * @param string $title (optional)
      * @return void
      */
     private function htmlHeader()
     {
-        $htmlTitle = !empty($this->title) 
-            ? $this->title . ' - ' . $this->config['name']
-            : $this->config['name'];
-
+        $htmlTitle = strlen($this->title) ? $this->title . ' - ' . $this->siteName : $this->siteName;
         print '<!doctype html>' . "\n"
             . '<html lang="en"><head>'
             . '<meta charset="UTF-8">'
@@ -265,10 +297,17 @@ class Web
             . '<link rel="manifest" href="' . $this->router->getHome() . 'site.webmanifest">'
             . '<link rel="stylesheet" href="' . $this->router->getHome() . 'style.css">'
             . '<title>' . $htmlTitle . '</title>' 
-            . '</head><body><div class="head">'
-            . $this->htmlSiteLink()
-            . ' - <a href="' . $this->router->getHome() . 'about/">About</a>'
-            . '</div><div class="body">';
+            . '</head><body>'
+            . '<div class="head">' 
+            . $this->htmlSiteLink() 
+                . '<div style="float:right;">'
+                . '<form action="' . $this->router->getHome() . '">'
+                . '<input name="q" value="" type="text" size="20">'
+                . '<input type="submit" value="search">'
+                . '</form>'
+                . '</div>'
+            . '</div>'
+            . '<div class="body">';
     }
 
     /**
@@ -276,9 +315,9 @@ class Web
      */
     private function htmlFooter()
     {
-        print '</div>'
-            . '<footer>' . $this->htmlSiteLink() 
-            . ' - <a href="' . $this->router->getHome() . 'about/">About</a>'
+        print '</div><footer>' 
+            . $this->htmlSiteLink()
+            . '<br /><small>page generated in ' . $this->endTimer('page') . ' seconds</small>'
             . '</footer></body></html>';
     }
 
@@ -287,6 +326,7 @@ class Web
      */
     private function htmlSiteLink()
     {
-        return '<a href="' . $this->router->getHome() . '">' . $this->config['name'] . '</a>';
+        return '<a href="' . $this->router->getHome() . '">' . $this->siteName . '</a>'
+            . ' - <a href="' . $this->router->getHome() . 'about/">About</a>';
     }
 }
