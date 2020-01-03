@@ -20,7 +20,12 @@ class Web extends Base
         $this->router->allow('/r/?/?', 'topic');
         $this->router->allow('/r/?/?/?', 'topic');
         $this->router->allow('/about', 'about');
+        $this->router->allow('/refresh', 'refresh');
+        $this->router->allow('/refresh/?', 'refresh');
+        $this->router->allow('/refresh/?/?', 'refresh');
+        $this->router->allow('/refresh/?/?/?', 'refresh');
         $control = $this->router->match();
+        $this->verbose('route: control: ' . $control);
         if (!$control || !method_exists($this, $control)) {
             $this->error404('Page Not Found');
         }
@@ -100,9 +105,9 @@ class Web extends Base
         $this->htmlFooter();
     }
 
-    private function topic()
+    private function setQueryFromUrl()
     {
-        // get topic query from url
+        // get query from url
         $this->query = $this->router->getVar(0);
         if ($this->router->getVar(1)) {
             $this->query .= '/' . $this->router->getVar(1);
@@ -113,10 +118,22 @@ class Web extends Base
                 }
             }
         }
-        // format topic query
+        if (!is_string($this->query) || !strlen($this->query)) {
+            $this->query = '';
+            return;
+        }
+        // format query
         $this->query = trim($this->query);
         $this->query = str_replace('_', ' ', $this->query);
         $this->query = urldecode($this->query);
+        if (!is_string($this->query) || !strlen($this->query)) {
+            $this->query = '';
+        }
+    }
+
+    private function topic()
+    {
+        $this->setQueryFromUrl();
 
         if (!strlen($this->query)) {
             $this->error404('Not Found');
@@ -161,7 +178,6 @@ class Web extends Base
         $this->verbose('topicPage: count.data.refs: ' . count($data['refs']));
         $this->verbose('topicPage: count.data.templates: ' . count($data['templates']));
         $this->htmlHeader();
-
 
         // build array of related topics, mainspace topics only
         $topics = [];
@@ -208,7 +224,7 @@ class Web extends Base
                                         array_search($exTopic['*'], $topics)
                                     ]
                                 );
-                                $this->verbose('unset topic: ' . $exTopic['*']);
+                                //$this->verbose('unset topic: ' . $exTopic['*']);
                             }
                         }
                     }
@@ -260,17 +276,98 @@ class Web extends Base
             //. '</a>'
             . '</small>';
 
+        $dataAge = '?';
+        $age = $this->filesystem->age($data['title']);
+        if ($age) {
+            $dataAge = gmdate('Y-m-d H:i:s', $age);
+        }
+        print '<br /><br /><small>'
+            . 'Page served @ ' . gmdate('Y-m-d H:i:s') . ' UTC'
+            . '<br />Data cached @ ' . $dataAge . ' UTC'
+            . ' - <a href="' . $this->router->getHome() . 'refresh/' 
+            . $this->encodeLink($data['title'])
+            . '">Refresh Data</a>'
+            . '</small>';
+
+        $this->htmlFooter();
+    }
+
+    private function refresh()
+    {
+        $this->setQueryFromUrl();
+        if (!strlen($this->query)) {
+            $this->error404('Refresh Topic Not Found');
+        }
+
+        // does cache file exist?
+        $this->filesystem = new Filesystem();
+        $this->filesystem->verbose = $this->verbose;
+        if (!$this->filesystem->exists($this->query)) {
+            $this->error404('Cache File Not Found');
+        }
+
+        if (!empty($_POST)) {
+            $answer = isset($_POST['d']) ? $_POST['d'] : '';
+            if (!strlen($answer)) {
+                $this->error404('Answer Not Found');
+            }
+
+            $submitTime = !empty($_POST['c']) ? intval($_POST['c']) : false;
+            if (!$submitTime || (time() - $submitTime) > 60) {
+                $this->error404('Request Timed Out');
+            }
+
+            $one = isset($_POST['a']) ? $_POST['a'] : '';
+            $two = isset($_POST['b']) ? $_POST['b'] : '';
+            if (!strlen($one) || !strlen($two)) {
+                $this->error404('Invalid Request');
+            }
+
+            if (($one + $two) != $answer) {
+                $this->error404('Invalid Answer');
+            }
+            
+            if (!$this->filesystem->delete($this->query)) {
+                $this->error404('Deletion Failed');
+            }
+            $this->htmlHeader();
+            print '<p>OK - cache deleted</p>';
+            print '<p><a href="' . $this->getLink($this->query) . '">' . $this->query . '</a></p>';
+            $this->htmlFooter();
+            return;
+        }
+
+        $this->title = 'Refresh';
+        $this->htmlHeader();
+        print '<p><b><a href="' . $this->getLink($this->query) . '">' . $this->query 
+            . '</a></b> is currently cached.</p>';
+
+        $letterOne = chr(rand(65,90));
+        $numOne = rand(0, 10);
+        $letterTwo = chr(rand(65,90));
+        $numTwo = rand(0, 10);
+        $answer = $numOne + $numTwo;
+
+        print '<form method="POST">'
+            . '<input type="hidden" name="a" value="' . $numOne . '">'
+            . '<input type="hidden" name="b" value="' . $numTwo . '">'
+            . '<input type="hidden" name="c" value="' . time() . '">'
+            . "If $letterOne = $numOne and $letterTwo = $numTwo"
+            . " then  $letterOne + $letterTwo = "
+            . '<input name="d" value="" size="4">'
+            . '<br /><br />'
+            . '<input type="submit" value="    Delete Cache    ">'
+            . '</form>';
+
         $this->htmlFooter();
     }
 
     /**
+     * @param string $query
      * @return string
      */
-    private function getLink($query = '')
+    private function encodeLink($query)
     {
-        if (!$query) {
-            $query = $this->query;
-        }
         // @see https://www.mediawiki.org/wiki/Manual:PAGENAMEE_encoding
         $replacers = [
             ' ' => '_',
@@ -290,7 +387,20 @@ class Web extends Base
             $query = str_replace($old, $new, $query);
         }
 
-        return $this->router->getHome() . 'r/' . $query;
+        return $query;
+    }
+
+    /**
+     * @return string
+     */
+    private function getLink($query = '')
+    {
+        if (!$query) {
+            $query = $this->query;
+        }
+       
+
+        return $this->router->getHome() . 'r/' . $this->encodeLink($query);
     }
 
     /**

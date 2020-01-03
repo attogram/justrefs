@@ -81,6 +81,48 @@ class Filesystem extends Base
 
     /**
      * @param string $name
+     * @return bool
+     */
+    public function delete($name)
+    {
+        $this->verbose('delete: name: ' . $name);
+        if (!$this->exists($name)) {
+            $this->verbose('delete: ERROR: does not exist');
+            return false;
+        }
+        $file = $this->getPath($name);
+        if (!$file) {
+            $this->verbose('delete: ERROR: path empty');
+            return false;
+        }
+        if (unlink($file)) {
+            return true;
+        }
+        $this->verbose('delete: ERROR: unlink failed');
+        return false;
+    }
+
+    /**
+     * @param string $name
+     * @return int|false - unix time stamp, or false
+     */
+    public function age($name)
+    {
+        $this->verbose('age: name: ' . $name);
+        if (!$this->exists($name)) {
+            $this->verbose('age: ERROR: does not exist');
+            return false;
+        }
+        $file = $this->getPath($name);
+        if (!$file) {
+            $this->verbose('age: ERROR: path empty');
+            return false;
+        }
+        return filemtime($file);
+    }
+
+    /**
+     * @param string $name
      * @return string
      */
     private function getPath($name)
