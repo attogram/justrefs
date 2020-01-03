@@ -235,11 +235,12 @@ class Web extends Base
         foreach ($refs as $ref) {
             print '<li><a href="' . $ref . '" target="_blank">' . $ref . '</a></li>';
         }
+
         $wikipediaUrl = 'https://en.wikipedia.org/wiki/' . $data['title'];
-
         $wikipediaUrl = str_replace('+', '_', $wikipediaUrl);
+        $wikipediaUrl = str_replace(' ', '_', $wikipediaUrl);
+        
         print '</ol></div></div>';
-
 
         print '<hr /><small><b>' . count($templates) . '</b> Included Templates:</small><ol>';
         foreach ($templates as $template) {
