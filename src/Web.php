@@ -94,7 +94,7 @@ class Web extends Base
         $this->htmlHeader();
         print '<b>' . count($data) . '</b> results<ol>';
         foreach ($data as $topic) {
-            print '<li><a href="r/' . $topic . '">' . $topic . '</a></li>';
+            print '<li><a href="' . $this->getLink($topic) . '">' . $topic . '</a></li>';
         }
         print '</ol>';
         $this->htmlFooter();
@@ -270,9 +270,9 @@ class Web extends Base
         if (!$query) {
             $query = $this->query;
         }
-        $page = str_replace(' ', '_', $query);
-        $page = str_replace('?', '%3F', $query);
-        return $this->router->getHome() . 'r/' . $page;
+        $query = str_replace(' ', '_', $query);
+        $query = str_replace('?', '%3F', $query);
+        return $this->router->getHome() . 'r/' . $query;
     }
 
     /**
