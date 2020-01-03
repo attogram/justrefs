@@ -1,8 +1,8 @@
 {
     "name": "attogram/justrefs",
-    "description": "Just Refs",
+    "description": "Just Refs - The Naked Wikipedia",
     "type": "project",
-    "license": "proprietary",
+    "license": "MIT",
     "require": {
         "lib-curl": "*",
         "attogram/router": "^4.1"
