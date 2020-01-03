@@ -239,7 +239,7 @@ class Web extends Base
         $wikipediaUrl = 'https://en.wikipedia.org/wiki/' . $data['title'];
         $wikipediaUrl = str_replace('+', '_', $wikipediaUrl);
         $wikipediaUrl = str_replace(' ', '_', $wikipediaUrl);
-        
+
         print '</ol></div></div>';
 
         print '<hr /><small><b>' . count($templates) . '</b> Included Templates:</small><ol>';
@@ -271,8 +271,25 @@ class Web extends Base
         if (!$query) {
             $query = $this->query;
         }
-        $query = str_replace(' ', '_', $query);
-        $query = str_replace('?', '%3F', $query);
+        // @see https://www.mediawiki.org/wiki/Manual:PAGENAMEE_encoding
+        $replacers = [
+            ' ' => '_',
+            '%' => '%25', // do first before any other %## replacers
+            '"' => '%22',
+            '&' => '%26',
+            "'" => '%27',
+            '+' => '%2B',
+            '=' => '%3D',
+            '?' => '%3F',
+            "\\" => '%5C',
+            '^' => '%5E',
+            '`' => '%60',
+            '~' => '%7E',
+        ];
+        foreach ($replacers as $old => $new) {
+            $query = str_replace($old, $new, $query);
+        }
+
         return $this->router->getHome() . 'r/' . $query;
     }
 
