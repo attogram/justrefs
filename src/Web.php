@@ -94,7 +94,7 @@ class Web extends Base
         $this->htmlHeader();
         print '<b>' . count($data) . '</b> results<ol>';
         foreach ($data as $topic) {
-            print '<li><a href="r/' . urlencode($topic) . '">' . $topic . '</a></li>';
+            print '<li><a href="r/' . $topic . '">' . $topic . '</a></li>';
         }
         print '</ol>';
         $this->htmlFooter();
@@ -235,7 +235,8 @@ class Web extends Base
         foreach ($refs as $ref) {
             print '<li><a href="' . $ref . '" target="_blank">' . $ref . '</a></li>';
         }
-        $wikipediaUrl = 'https://en.wikipedia.org/wiki/' . urlencode($data['title']);
+        $wikipediaUrl = 'https://en.wikipedia.org/wiki/' . $data['title'];
+
         $wikipediaUrl = str_replace('+', '_', $wikipediaUrl);
         print '</ol></div></div>';
 
@@ -270,7 +271,7 @@ class Web extends Base
             $query = $this->query;
         }
         $page = str_replace(' ', '_', $query);
-        $page = urlencode($page);
+        $page = str_replace('?', '%3F', $query);
         return $this->router->getHome() . 'r/' . $page;
     }
 
