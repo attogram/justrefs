@@ -20,3 +20,8 @@
     <a href="../r/Wikimedia_Foundation">Wikimedia Foundation</a>,
     or any <a href="../r/List_of_Wikipedias">Wikipedia</a> website.
 </p>
+<p>
+    Just Refs is an open source project. 
+    Find out more at 
+    &lt;<a href="https://github.com/attogram/justrefs">https://github.com/attogram/justrefs</a>&gt;
+<p>
