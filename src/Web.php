@@ -1,11 +1,15 @@
 <?php
+/**
+ * Just Refs
+ * Web Class
+ */
 declare(strict_types = 1);
 
 namespace Attogram\Justrefs;
 
 class Web extends Base
 {
-    private $data = [];
+    private $vars = [];
     private $filesystem;
     private $router;
     private $query = '';
@@ -25,7 +29,6 @@ class Web extends Base
         $this->router->allow('/refresh/?/?', 'refresh');
         $this->router->allow('/refresh/?/?/?', 'refresh');
         $control = $this->router->match();
-        $this->verbose('route: control: ' . $control);
         if (!$control || !method_exists($this, $control)) {
             $this->error404('Page Not Found');
         }
@@ -35,9 +38,9 @@ class Web extends Base
     private function about()
     {
         $this->title = 'About this site';
-        $this->htmlHeader();
-        include('../templates/about.php');
-        $this->htmlFooter();
+        $this->includeTemplate('header');
+        $this->includeTemplate('about');
+        $this->includeTemplate('footer');
     }
 
     private function home()
@@ -47,9 +50,10 @@ class Web extends Base
 
         // No search query, show homepage
         if (!is_string($this->query) || !strlen(trim($this->query))) {
-            $this->htmlHeader();
-            include('../templates/home.php');
-            $this->htmlFooter();
+            $this->title = $this->siteName;
+            $this->includeTemplate('header');
+            $this->includeTemplate('home');
+            $this->includeTemplate('footer');
             return;
         }
 
@@ -85,10 +89,11 @@ class Web extends Base
 
         // no search results
         //header('HTTP/1.0 404 Not Found');
-        $this->htmlHeader();
-        include('../templates/home.php');
+        $this->title = $this->siteName;
+        $this->includeTemplate('header');
+        $this->includeTemplate('home');
         print '<b>0</b> results';
-        $this->htmlFooter();
+        $this->includeTemplate('footer');
     }
 
     /**
@@ -96,13 +101,14 @@ class Web extends Base
      */
     private function searchResults($data)
     {
-        $this->htmlHeader();
+        $this->title = 'search results - ' . $this->siteName;
+        $this->includeTemplate('header');
         print '<b>' . count($data) . '</b> results<ol>';
         foreach ($data as $topic) {
             print '<li><a href="' . $this->getLink($topic) . '">' . $topic . '</a></li>';
         }
         print '</ol>';
-        $this->htmlFooter();
+        $this->includeTemplate('footer');
     }
 
     private function setQueryFromUrl()
@@ -173,28 +179,72 @@ class Web extends Base
      */
     private function topicPage($data)
     {
-        $this->title = $data['title'];
-        $this->htmlHeader();
+        // set template variables
+        $this->setVarsTopics($data);
+        $this->setVarsRefs($data);
+        $this->setVarsTemplates($data);
 
-        // build array of related topics, mainspace topics only
-        $topics = [];
-        foreach ($data['topics'] as $topic) {
-            if ($topic['ns'] == '0') {
-                $topics[$topic['*']] = $topic['*'];
-            }
+        // sort alphabetically
+        sort($this->vars['topics']);
+        sort($this->vars['topics_internal']);
+        sort($this->vars['refs']);
+        sort($this->vars['templates']);
+
+        // extraction source url
+        $this->vars['source'] = 'https://en.wikipedia.org/wiki/' . $this->encodeLink($data['title']);
+
+        // Data and Cache age
+        $dataAge = '?';
+        $age = $this->filesystem->age($data['title']);
+        if ($age) {
+            $dataAge = gmdate('Y-m-d H:i:s', $age);
         }
-        sort($topics); // sort alphabetically
+        $this->vars['dataAge'] = $dataAge;
+        $this->vars['now'] = gmdate('Y-m-d H:i:s');
+        $this->vars['refresh'] = $this->router->getHome() . 'refresh/' . $this->encodeLink($data['title']);
+        $this->vars['h1'] = $data['title'];
 
+        // display page
+        $this->title = $data['title'] . ' - ' . $this->siteName;
+        $this->includeTemplate('header');
+        $this->includeTemplate('topic');
+        $this->includeTemplate('footer');
+    }
+
+    private function setVarsTopics($data)
+    {
+        // build array of related topics
+        $this->vars['topics'] = [];
+        $this->vars['topics_internal'] = [];
+        foreach ($data['topics'] as $topic) {
+            switch ($topic['ns']) { // @see https://en.wikipedia.org/wiki/Wikipedia:Namespace
+                case '0': // Mainspace
+                    $this->vars['topics'][$topic['*']] = $topic['*'];
+                    break;
+                case '6': // File
+                case '14': // Category
+                    break; // exclude
+                default:
+                    $this->vars['topics_internal'][$topic['*']] = $topic['*'];
+                    break;
+            }                
+        }
+    }
+
+    private function setVarsRefs($data)
+    {
         // build array of reference links
-        $refs = [];
+        $this->vars['refs'] = [];
         foreach ($data['refs'] as $ref) {
             if (substr($ref, 0, 2) == '//') {
                 $ref = 'https:' . $ref;
             }
-            $refs[] = $ref;
+            $this->vars['refs'][] = $ref;
         }
-        sort($refs); // sort alphabetically
+    }
 
+    private function setVarsTemplates($data)
+    {
         // build array of templates
         $templates = [];
         $cachedTemplates = [];
@@ -210,9 +260,11 @@ class Web extends Base
                     foreach ($templateData['topics'] as $exTopic) {
                         if ($exTopic['ns'] == '0') {
                             // remove this template topic from master topic list
-                            if (in_array($exTopic['*'], $topics)) {
+                            if (in_array($exTopic['*'], $this->vars['topics'])) {
                                 unset(
-                                    $topics[array_search($exTopic['*'], $topics)]
+                                    $this->vars['topics'][
+                                        array_search($exTopic['*'], $this->vars['topics'])
+                                    ]
                                 );
                             }
                         }
@@ -220,60 +272,7 @@ class Web extends Base
                 }
             }
         }
-        sort($templates); // sort alphabetically
-
-        // display
-        print '<h1>' . $data['title'] . '</h1>';
-        print '<div class="flex-container">';
-        print '<div class="topics">'
-            . '<small><b>' . count($topics) . '</b> Related Topics:</small><ol>';
-        foreach ($topics as $topic) {
-            print '<li><a href="' . $this->getLink($topic) . '">' . $topic . '</a></li>';
-        }
-        print '</ol></div>';
-
-        print '<div class="refs">'
-            . '<small><b>' . count($refs) . '</b> Reference Links:</small><ol>';
-        foreach ($refs as $ref) {
-            print '<li><a href="' . $ref . '" target="_blank">' . $ref . '</a></li>';
-        }
-
-        $wikipediaUrl = 'https://en.wikipedia.org/wiki/' . $data['title'];
-        $wikipediaUrl = str_replace('+', '_', $wikipediaUrl);
-        $wikipediaUrl = str_replace(' ', '_', $wikipediaUrl);
-
-        print '</ol></div></div>';
-
-        print '<hr /><small><b>' . count($templates) . '</b> Included Templates:</small><ol>';
-        foreach ($templates as $template) {
-            $class = in_array($template, $cachedTemplates)
-                ? 'cached'
-                : 'missing';
-            print '<li><a href="' . $this->getLink($template) . '" class="' . $class 
-                . '">' . $template . '</a></li>';
-        }
-        print '</ol>';
-
-        print '<hr /><small>extracted from  &lt;'
-            . '<a href="' . $wikipediaUrl . '" target="_blank">' 
-            . $wikipediaUrl . '</a>&gt; released under the '
-            . 'Creative Commons Attribution-Share-Alike License 3.0'
-            . '</small>';
-
-        $dataAge = '?';
-        $age = $this->filesystem->age($data['title']);
-        if ($age) {
-            $dataAge = gmdate('Y-m-d H:i:s', $age);
-        }
-        print '<br /><br /><small>'
-            . 'Page served @ ' . gmdate('Y-m-d H:i:s') . ' UTC'
-            . '<br />Data cached @ ' . $dataAge . ' UTC'
-            . ' - <a href="' . $this->router->getHome() . 'refresh/' 
-            . $this->encodeLink($data['title'])
-            . '">Refresh Data</a>'
-            . '</small>';
-
-        $this->htmlFooter();
+        $this->vars['templates'] = $templates;
     }
 
     private function refresh()
@@ -314,15 +313,15 @@ class Web extends Base
             if (!$this->filesystem->delete($this->query)) {
                 $this->error404('Deletion Failed');
             }
-            $this->htmlHeader();
+            $this->includeTemplate('header');
             print '<p>OK - cache deleted</p>';
             print '<p><a href="' . $this->getLink($this->query) . '">' . $this->query . '</a></p>';
-            $this->htmlFooter();
+            $this->includeTemplate('footer');
             return;
         }
 
         $this->title = 'Refresh';
-        $this->htmlHeader();
+        $this->includeTemplate('header');
         print '<p><b><a href="' . $this->getLink($this->query) . '">' . $this->query 
             . '</a></b> is currently cached.</p>';
 
@@ -343,7 +342,7 @@ class Web extends Base
             . '<input type="submit" value="    Delete Cache    ">'
             . '</form>';
 
-        $this->htmlFooter();
+        $this->includeTemplate('footer');
     }
 
     /**
@@ -370,7 +369,6 @@ class Web extends Base
         foreach ($replacers as $old => $new) {
             $query = str_replace($old, $new, $query);
         }
-
         return $query;
     }
 
@@ -382,8 +380,6 @@ class Web extends Base
         if (!$query) {
             $query = $this->query;
         }
-       
-
         return $this->router->getHome() . 'r/' . $this->encodeLink($query);
     }
 
@@ -394,63 +390,22 @@ class Web extends Base
     private function error404($message = 'Page Not Found')
     {
         header('HTTP/1.0 404 Not Found');
-        $this->htmlHeader();
+        $this->includeTemplate('header');
         print '<h1>Error 404</h1><h2>' . $message . '</h2>';
-        $this->htmlFooter();
+        $this->includeTemplate('footer');
         exit;
     }
 
     /**
-     * @param string $title (optional)
-     * @return void
+     * @param string $name
      */
-    private function htmlHeader()
+    private function includeTemplate($name)
     {
-        $htmlTitle = strlen($this->title) 
-            ? $this->title . ' - ' . $this->siteName 
-            : $this->siteName;
-
-        print '<!doctype html>' . "\n"
-            . '<html lang="en"><head>'
-            . '<meta charset="UTF-8">'
-            . '<meta http-equiv="X-UA-Compatible" content="IE=edge">'
-            . '<meta name="viewport" content="width=device-width, initial-scale=1">'
-            . '<link rel="apple-touch-icon" sizes="180x180" href="' . $this->router->getHome() . 'apple-touch-icon.png">'
-            . '<link rel="icon" type="image/png" sizes="32x32" href="' . $this->router->getHome() . 'favicon-32x32.png">'
-            . '<link rel="icon" type="image/png" sizes="16x16" href="' . $this->router->getHome() . 'favicon-16x16.png">'
-            . '<link rel="manifest" href="' . $this->router->getHome() . 'site.webmanifest">'
-            . '<link rel="stylesheet" href="' . $this->router->getHome() . 'style.css">'
-            . '<title>' . $htmlTitle . '</title>' 
-            . '</head><body>'
-            . '<div class="head">' 
-            . $this->htmlSiteLink() 
-                . '<div style="float:right;">'
-                . '<form action="' . $this->router->getHome() . '">'
-                . '<input name="q" value="" type="text" size="18">'
-                . '<input type="submit" value="search">'
-                . '</form>'
-                . '</div>'
-            . '</div>'
-            . '<div class="body">';
-    }
-
-    /**
-     * @return void
-     */
-    private function htmlFooter()
-    {
-        print '</div><footer>' 
-            . $this->htmlSiteLink()
-            . '<br /><small>page generated in ' . $this->endTimer('page') . ' seconds</small>'
-            . '</footer></body></html>';
-    }
-
-    /**
-     * @return string
-     */
-    private function htmlSiteLink()
-    {
-        return '<a href="' . $this->router->getHome() . '">' . $this->siteName . '</a>'
-            . ' - <a href="' . $this->router->getHome() . 'about/">About</a>';
+        $template = '../templates/' . $name . '.php';
+        if (is_readable($template)) {
+            include($template);
+            return;
+        }
+        $this->verbose('includeTemplate: ERROR NOT FOUND: name:  ' . $template);
     }
 }

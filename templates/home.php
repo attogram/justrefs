@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * Just Refs
+ * Home Page template
+ */
 $menus = [
     'Art', 'Culture', 'Entertainment', 'Geography', 'Health', 'History', 'Logic',
     'Mathematics', 'Medicine', 'Nature', 'People', 'Philosophy', 'Religion',

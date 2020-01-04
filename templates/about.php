@@ -1,3 +1,9 @@
+<?php
+/**
+ * Just Refs
+ * About Page template
+ */
+?>
 <h1>
     Welcome to <b><?= $this->siteName ?></b> <small>v<?= self::VERSION ?></small>
 </h1>

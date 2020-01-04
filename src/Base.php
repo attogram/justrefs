@@ -1,11 +1,15 @@
 <?php
+/**
+ * Just Refs
+ * Base Class
+ */
 declare(strict_types = 1);
 
 namespace Attogram\Justrefs;
 
 class Base
 {
-    const VERSION = '0.0.10';
+    const VERSION = '0.1.0';
 
     public $verbose;
 
@@ -38,6 +42,9 @@ class Base
      */
     protected function endTimer($name)
     {
+        if (empty($this->timer[$name])) {
+            return 0.0;
+        }
         return round(microtime(true) - $this->timer[$name], 4);
     }
 }

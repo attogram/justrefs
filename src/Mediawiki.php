@@ -1,4 +1,8 @@
 <?php
+/**
+ * Just Refs
+ * Mediawiki Class
+ */
 declare(strict_types = 1);
 
 namespace Attogram\Justrefs;
