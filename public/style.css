@@ -15,7 +15,11 @@ ol, ul {
     margin: 0;
 }
 ol {
+    list-style-type: decimal-leading-zero;
     padding: 7px 0 0 0;
+}
+ul li {
+    list-style-type: inherit;
 }
 pre {
     margin:0;
@@ -27,9 +31,7 @@ a:link { text-decoration:none; color:navy}
 a:visited { text-decoration:none; color:navy }
 a:hover { background-color:yellow; color:black; }
 a:active { background-color:yellow; color:black; }
-a.missing {
-    color:red;
-}
+a.missing { color:blue; }
 .head {
     background-color: lightgrey;
     padding:10px 10px 10px 10px;

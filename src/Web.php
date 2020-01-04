@@ -9,11 +9,12 @@ namespace Attogram\Justrefs;
 
 class Web extends Base
 {
-    private $vars = [];
-    private $filesystem;
-    private $router;
-    private $query = '';
-    private $title = '';
+    private $data = []; // topic data
+    private $filesystem; // Attogram\Justrefs\Filesystem
+    private $query = ''; // current query
+    private $router; // Attogram\Router\Router
+    private $title = ''; // current page title
+    private $vars = []; // template vars
 
     public function route()
     {
@@ -67,10 +68,10 @@ class Web extends Base
         $results = $this->filesystem->get($filename);
         if ($results) {
             // get cached results
-            $data = @json_decode($results, true);
-            if (is_array($data)) {
+            $this->data = @json_decode($results, true);
+            if (is_array($this->data)) {
                 // show cached results
-                $this->searchResults($data);
+                $this->searchResults($this->data);
                 return;
             }
         }
@@ -78,12 +79,12 @@ class Web extends Base
         // get search results from API
         $mediaWiki = new MediaWiki();
         $mediaWiki->verbose = $this->verbose;
-        $results = $mediaWiki->search($this->query);
-        if ($results) {
+        $this->data = $mediaWiki->search($this->query);
+        if ($this->data) {
             // save results to cache
-            $this->filesystem->set($filename, json_encode($results));
+            $this->filesystem->set($filename, json_encode($this->data));
             // show api results
-            $this->searchResults($results);
+            $this->searchResults();
             return;
         }
 
@@ -96,15 +97,12 @@ class Web extends Base
         $this->includeTemplate('footer');
     }
 
-    /**
-     * @param array $data
-     */
-    private function searchResults($data)
+    private function searchResults()
     {
         $this->title = 'search results - ' . $this->siteName;
         $this->includeTemplate('header');
-        print '<b>' . count($data) . '</b> results<ol>';
-        foreach ($data as $topic) {
+        print '<b>' . count($this->data) . '</b> results<ol>';
+        foreach ($this->data as $topic) {
             print '<li><a href="' . $this->getLink($topic) . '">' . $topic . '</a></li>';
         }
         print '</ol>';
@@ -151,10 +149,10 @@ class Web extends Base
         $results = $this->filesystem->get($this->query);
         if ($results) {
             // get cached results
-            $data = @json_decode($results, true);
-            if (is_array($data)) {
+            $this->data = @json_decode($results, true);
+            if (is_array($this->data)) {
                 // show cached results
-                $this->topicPage($data);
+                $this->topicPage($this->data);
                 return;
             }
         }
@@ -162,61 +160,59 @@ class Web extends Base
         // get topic from API
         $mediaWiki = new MediaWiki();
         $mediaWiki->verbose = $this->verbose;
-        $data = $mediaWiki->links($this->query);
-        if ($data) {
+        $this->data = $mediaWiki->links($this->query);
+        if ($this->data) {
             // save results to cache
-            $this->filesystem->set($this->query, json_encode($data));
+            $this->filesystem->set($this->query, json_encode($this->data));
             // show api results
-            $this->topicPage($data);
+            $this->topicPage($this->data);
             return;
         }
 
         $this->error404('Topic Not Found');
     }
 
-    /**
-     * @param array $data
-     */
-    private function topicPage($data)
+    private function topicPage()
     {
         // set template variables
-        $this->setVarsTopics($data);
-        $this->setVarsRefs($data);
-        $this->setVarsTemplates($data);
+        $this->setVarsTopics();
+        $this->setVarsRefs();
+        $this->setVarsTemplates();
 
-        // sort alphabetically
+        $this->setVarsMetaInformation();
+
+        // sort lists alphabetically
         sort($this->vars['topics']);
         sort($this->vars['topics_internal']);
         sort($this->vars['refs']);
         sort($this->vars['templates']);
 
         // extraction source url
-        $this->vars['source'] = 'https://en.wikipedia.org/wiki/' . $this->encodeLink($data['title']);
+        $this->vars['source'] = 'https://en.wikipedia.org/wiki/' . $this->encodeLink($this->data['title']);
 
         // Data and Cache age
-        $dataAge = '?';
-        $age = $this->filesystem->age($data['title']);
+        $this->dataAge = '?';
+        $age = $this->filesystem->age($this->data['title']);
         if ($age) {
-            $dataAge = gmdate('Y-m-d H:i:s', $age);
+            $this->dataAge = gmdate('Y-m-d H:i:s', $age);
         }
-        $this->vars['dataAge'] = $dataAge;
+        $this->vars['dataAge'] = $this->dataAge;
         $this->vars['now'] = gmdate('Y-m-d H:i:s');
-        $this->vars['refresh'] = $this->router->getHome() . 'refresh/' . $this->encodeLink($data['title']);
-        $this->vars['h1'] = $data['title'];
+        $this->vars['refresh'] = $this->router->getHome() . 'refresh/' . $this->encodeLink($this->data['title']);
+        $this->vars['h1'] = $this->data['title'];
 
         // display page
-        $this->title = $data['title'] . ' - ' . $this->siteName;
+        $this->title = $this->data['title'] . ' - ' . $this->siteName;
         $this->includeTemplate('header');
         $this->includeTemplate('topic');
         $this->includeTemplate('footer');
     }
 
-    private function setVarsTopics($data)
+    private function setVarsTopics()
     {
-        // build array of related topics
         $this->vars['topics'] = [];
         $this->vars['topics_internal'] = [];
-        foreach ($data['topics'] as $topic) {
+        foreach ($this->data['topics'] as $topic) {
             switch ($topic['ns']) { // @see https://en.wikipedia.org/wiki/Wikipedia:Namespace
                 case '0': // Mainspace
                     $this->vars['topics'][$topic['*']] = $topic['*'];
@@ -231,11 +227,10 @@ class Web extends Base
         }
     }
 
-    private function setVarsRefs($data)
+    private function setVarsRefs()
     {
-        // build array of reference links
         $this->vars['refs'] = [];
-        foreach ($data['refs'] as $ref) {
+        foreach ($this->data['refs'] as $ref) {
             if (substr($ref, 0, 2) == '//') {
                 $ref = 'https:' . $ref;
             }
@@ -243,12 +238,37 @@ class Web extends Base
         }
     }
 
-    private function setVarsTemplates($data)
+    private function setVarsTemplates()
     {
+        $this->vars['templates'] = [];
+        foreach ($this->data['templates'] as $template) {
+            if ($template['ns'] == '10') {
+                $this->vars['templates'][] = $template['*'];
+            }
+        }
+    }
+
+    private function setVarsMetaInformation()
+    {
+        $this->vars['meta'] = [];
+        foreach ($this->vars['topics'] as $topic) {
+            $this->vars['meta'][$topic]['exists'] = $this->filesystem->exists($topic);
+        }
+        foreach ($this->vars['topics_internal'] as $topic) {
+            $this->vars['meta'][$topic]['exists'] = $this->filesystem->exists($topic);
+        }
+        foreach ($this->vars['templates'] as $topic) {
+            $this->vars['meta'][$topic]['exists'] = $this->filesystem->exists($topic);
+        }
+    }
+
+
+
+    private function xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx() {
         // build array of templates
         $templates = [];
         $cachedTemplates = [];
-        foreach ($data['templates'] as $template) {
+        foreach ($this->data['templates'] as $template) {
             if ($template['ns'] == '10') {
                 $templates[] = $template['*'];
                 // is template cached?
