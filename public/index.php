@@ -1,4 +1,8 @@
 <?php
+/**
+ * Just Refs
+ * Public Index Page
+ */
 $verbose = false;
 
 $vendor = '../vendor/autoload.php';

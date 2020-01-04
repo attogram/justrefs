@@ -173,10 +173,7 @@ class Web extends Base
      */
     private function topicPage($data)
     {
-        $this->verbose('topicPage: data.title: ' . $data['title']);
-        $this->verbose('topicPage: count.data.topics: ' . count($data['topics']));
-        $this->verbose('topicPage: count.data.refs: ' . count($data['refs']));
-        $this->verbose('topicPage: count.data.templates: ' . count($data['templates']));
+        $this->title = $data['title'];
         $this->htmlHeader();
 
         // build array of related topics, mainspace topics only
@@ -186,9 +183,7 @@ class Web extends Base
                 $topics[$topic['*']] = $topic['*'];
             }
         }
-        // sort alphabetically
-        sort($topics);
-        $this->verbose('topicPage: count.topics: ' . count($topics));
+        sort($topics); // sort alphabetically
 
         // build array of reference links
         $refs = [];
@@ -198,9 +193,7 @@ class Web extends Base
             }
             $refs[] = $ref;
         }
-        // sort alphabetically
-        sort($refs);
-        $this->verbose('topicPage: count.refs: ' . count($refs));
+        sort($refs); // sort alphabetically
 
         // build array of templates
         $templates = [];
@@ -208,7 +201,6 @@ class Web extends Base
         foreach ($data['templates'] as $template) {
             if ($template['ns'] == '10') {
                 $templates[] = $template['*'];
-
                 // is template cached?
                 $templateJson = $this->filesystem->get($template['*']);
                 $templateData = @json_decode($templateJson, true);
@@ -220,21 +212,15 @@ class Web extends Base
                             // remove this template topic from master topic list
                             if (in_array($exTopic['*'], $topics)) {
                                 unset(
-                                    $topics[
-                                        array_search($exTopic['*'], $topics)
-                                    ]
+                                    $topics[array_search($exTopic['*'], $topics)]
                                 );
-                                //$this->verbose('unset topic: ' . $exTopic['*']);
                             }
                         }
                     }
                 }
             }
         }
-        // sort alphabetically
-        sort($templates);
-        $this->verbose('topicPage: count.templates: ' . count($templates));
-        $this->verbose('topicPage: count.topics: ' . count($topics));
+        sort($templates); // sort alphabetically
 
         // display
         print '<h1>' . $data['title'] . '</h1>';
@@ -271,9 +257,7 @@ class Web extends Base
         print '<hr /><small>extracted from  &lt;'
             . '<a href="' . $wikipediaUrl . '" target="_blank">' 
             . $wikipediaUrl . '</a>&gt; released under the '
-            //. '<a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">'
             . 'Creative Commons Attribution-Share-Alike License 3.0'
-            //. '</a>'
             . '</small>';
 
         $dataAge = '?';
@@ -422,7 +406,10 @@ class Web extends Base
      */
     private function htmlHeader()
     {
-        $htmlTitle = strlen($this->title) ? $this->title . ' - ' . $this->siteName : $this->siteName;
+        $htmlTitle = strlen($this->title) 
+            ? $this->title . ' - ' . $this->siteName 
+            : $this->siteName;
+
         print '<!doctype html>' . "\n"
             . '<html lang="en"><head>'
             . '<meta charset="UTF-8">'
@@ -439,7 +426,7 @@ class Web extends Base
             . $this->htmlSiteLink() 
                 . '<div style="float:right;">'
                 . '<form action="' . $this->router->getHome() . '">'
-                . '<input name="q" value="" type="text" size="20">'
+                . '<input name="q" value="" type="text" size="18">'
                 . '<input type="submit" value="search">'
                 . '</form>'
                 . '</div>'

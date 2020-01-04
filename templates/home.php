@@ -15,3 +15,5 @@ print '<br /><br />'
     . '<input name="q" value="" type="text" size="30">'
     . '<input type="submit" value="   search   ">'
     . '</form>';
+
+print '<p><a href="about/">About this site</a></p>';

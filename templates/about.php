@@ -1,5 +1,5 @@
 <h1>
-    Welcome to <b><?= $this->siteName ?></b> v<?= self::VERSION ?>
+    Welcome to <b><?= $this->siteName ?></b> <small>v<?= self::VERSION ?></small>
 </h1>
 <p>
     The <a href="../r/Goal">goal</a> of this <a href="../r/Website">website</a> is to help 
