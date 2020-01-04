@@ -6,13 +6,16 @@ body {
 }
 footer {
     background-color: lightgrey;
-    padding:10px 10px 10px 10px;
+    padding:10px;
 }
-ol {
+ol, ul {
     font-family:monospace;
     list-style-position: inside;
-    padding: 7px 0 0 0;
+    padding: 0;
     margin: 0;
+}
+ol {
+    padding: 7px 0 0 0;
 }
 pre {
     margin:0;
@@ -33,7 +36,7 @@ a.missing {
 }
 .body {
     background-color: white;
-    padding:10px 10px 30px 30px;
+    padding:10px 10px 10px 30px;
 }
 .flex-container {
     display: flex;
