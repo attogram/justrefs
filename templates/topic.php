@@ -70,7 +70,7 @@ $countTemplates = count($this->vars['templates']);
     <ol><?php
     foreach ($this->vars['templates'] as $template) {
         $class = '';
-        if (empty($this->vars['meta'][$topic]['exists'])) {
+        if (empty($this->vars['meta'][$template]['exists'])) {
             $class = 'missing';
         }
         print '<li><a href="' . $this->getLink($template) 

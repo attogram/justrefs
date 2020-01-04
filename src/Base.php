@@ -9,7 +9,7 @@ namespace Attogram\Justrefs;
 
 class Base
 {
-    const VERSION = '0.1.3';
+    const VERSION = '0.1.4';
 
     public $verbose;
 
