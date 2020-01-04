@@ -32,9 +32,9 @@ $countTemplates = count($this->vars['templates']);
     <ol><?php
     foreach ($this->vars['topics'] as $topic) {
         $class = '';
-        if (empty($this->vars['meta'][$topic]['exists'])) {
-            $class = 'missing';
-        }
+        //if (empty($this->vars['meta'][$topic]['exists'])) {
+        //    $class = 'missing';
+        //}
         print '<li><a href="' . $this->getLink($topic) 
             . '" class="' . $class . '">' . $topic . '</a></li>';
     }

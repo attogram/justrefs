@@ -178,9 +178,9 @@ class Web extends Base
         $this->setVarsTopics();
         $this->setVarsRefs();
         $this->setVarsTemplates();
-
         $this->setVarsMetaInformation();
-
+        $this->removeTemplateTopics();
+        
         // sort lists alphabetically
         sort($this->vars['topics']);
         sort($this->vars['topics_internal']);
@@ -262,37 +262,33 @@ class Web extends Base
         }
     }
 
+    private function removeTemplateTopics() {
+        foreach ($this->vars['templates'] as $template) {
+            if (empty($this->vars['meta'][$template]['exists'])) {
+                continue; // template not in cache
+            }
 
+            $templateJson = $this->filesystem->get($template);
+            $templateData = @json_decode($templateJson, true);
 
-    private function xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx() {
-        // build array of templates
-        $templates = [];
-        $cachedTemplates = [];
-        foreach ($this->data['templates'] as $template) {
-            if ($template['ns'] == '10') {
-                $templates[] = $template['*'];
-                // is template cached?
-                $templateJson = $this->filesystem->get($template['*']);
-                $templateData = @json_decode($templateJson, true);
-                //$this->verbose($templateData);
-                if (!empty($templateData['topics']) && is_array($templateData['topics'])) {
-                    $cachedTemplates[] = $template['*'];
-                    foreach ($templateData['topics'] as $exTopic) {
-                        if ($exTopic['ns'] == '0') {
-                            // remove this template topic from master topic list
-                            if (in_array($exTopic['*'], $this->vars['topics'])) {
-                                unset(
-                                    $this->vars['topics'][
-                                        array_search($exTopic['*'], $this->vars['topics'])
-                                    ]
-                                );
-                            }
-                        }
+            if (empty($templateData['topics']) || !is_array($templateData['topics'])) {
+                continue; // error
+            }
+
+            foreach ($templateData['topics'] as $exTopic) {
+                if ($exTopic['ns'] == '0') {
+                    // remove this template topic from master topic list
+                    if (in_array($exTopic['*'], $this->vars['topics'])) {
+                        unset(
+                            $this->vars['topics'][
+                                array_search($exTopic['*'], $this->vars['topics'])
+                            ]
+                        );
                     }
                 }
             }
+            
         }
-        $this->vars['templates'] = $templates;
     }
 
     private function refresh()

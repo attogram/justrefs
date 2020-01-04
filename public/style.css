@@ -27,11 +27,11 @@ pre {
 div {
     background-color:white;
 }
-a:link { text-decoration:none; color:navy}
-a:visited { text-decoration:none; color:navy }
+a:link { text-decoration:none; color:darkblue}
+a:visited { text-decoration:none; color:darkblue }
 a:hover { background-color:yellow; color:black; }
 a:active { background-color:yellow; color:black; }
-a.missing { color:blue; }
+a.missing { color: blueviolet; }
 .head {
     background-color: lightgrey;
     padding:10px 10px 10px 10px;
