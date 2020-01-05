@@ -34,25 +34,30 @@ class Filesystem extends Base
 
     /**
      * @param string $name
-     * @return string - file contents, or empty string on error
+     * @return array|false
      */
     public function get($name) 
     {
         if (!$this->exists($name)) {
-            return '';
+            return false;
         }
         $path = $this->getPath($name);
         if (empty($path)) {
             $this->verbose('get: ERROR: EMPTY PATH: ' . $path);
-            return '';
+            return false;
         }
         $contents = @file_get_contents($path);
         if (empty($contents)) {
-            $this->verbose('get: ERROR: NO CONENTS: ' . $path);
-            return '';
+            $this->verbose('get: ERROR: NO CONTENTS: ' . $path);
+            return false;
         }
-        $this->verbose("get: $name - $path - " . strlen($contents));
-        return $contents;
+        $data = @json_decode($contents, true);
+        if (!is_array($data)) {
+            $this->verbose('get: ERROR: JSON DECODE FAILED: ' . $path);
+            return false;
+        }
+        $this->verbose("get: $name - $path - " . count($data));
+        return $data;
     }
 
     /**
