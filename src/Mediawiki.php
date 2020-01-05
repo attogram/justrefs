@@ -26,6 +26,7 @@ class Mediawiki extends Base
             $this->verbose('links: ERROR: getApi call failed: ' . $url);
             return false;
         }
+
         $data = @json_decode($jsonData, true);
         if (empty($data) || !is_array($data)) {
             $this->verbose('links: ERROR: decode failed: ' . $query);
@@ -34,10 +35,18 @@ class Mediawiki extends Base
 
         $result = [];
 
+        if (isset($data['error'])
+            || !isset($data['parse']['title']) 
+            || empty($data['parse']['title'])
+        ) {
+            $result['title'] = $query;
+            $result['error'] = true;
+            $this->verbose('links: ERROR: NOT FOUND: ' . $query);
+            return $result;
+        }
+
         // set title
-        $result['title'] = isset($data['parse']['title'])
-            ? $data['parse']['title']
-            : '';
+        $result['title'] = $data['parse']['title'];
 
         // set related topics 
         $result['topics'] = isset($data['parse']['links'])
@@ -103,6 +112,7 @@ class Mediawiki extends Base
             return false;
         }
         $this->verbose('getApi: OK: ' . $url . ' - ' . strlen($result));
+        $this->verbose($result);
         return $result;
     }
 }

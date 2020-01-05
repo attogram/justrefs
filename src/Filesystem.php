@@ -39,24 +39,26 @@ class Filesystem extends Base
     public function get($name) 
     {
         if (!$this->exists($name)) {
+            $this->verbose("get: ERROR: NOT FOUND: $name");
             return false;
         }
         $path = $this->getPath($name);
         if (empty($path)) {
-            $this->verbose('get: ERROR: EMPTY PATH: ' . $path);
+            $this->verbose("get: ERROR: EMPTY PATH: $name - $path");
             return false;
         }
         $contents = @file_get_contents($path);
         if (empty($contents)) {
-            $this->verbose('get: ERROR: NO CONTENTS: ' . $path);
+            $this->verbose("get: ERROR: NO CONTENTS: $name - $path");
             return false;
         }
         $data = @json_decode($contents, true);
         if (!is_array($data)) {
-            $this->verbose('get: ERROR: JSON DECODE FAILED: ' . $path);
+            $this->verbose("get: ERROR: JSON DECODE FAILED: $name - $path");
             return false;
         }
         $this->verbose("get: $name - $path - " . count($data));
+        //$this->verbose($data);
         return $data;
     }
 
@@ -67,6 +69,8 @@ class Filesystem extends Base
      */
     public function set($name, $value) 
     {
+        $this->verbose("set: $name - $value");
+    
         $path = $this->getPath($name);
         $parts = explode(DIRECTORY_SEPARATOR, $path);
         array_pop($parts);

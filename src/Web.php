@@ -135,7 +135,12 @@ class Web extends Base
         // is topic in cache?
         $this->initFilesystem();
         $this->data = $this->filesystem->get($this->query);
+        //$this->verbose('topic: fs: query: ' . $this->query . ' - cached data: ' . print_r($this->data, true));
         if (is_array($this->data)) {
+            if (!empty($this->data['error'])) {
+                $this->error404('Topic Not Found', $this->query);
+                return;
+            }
             $this->topicPage($this->data); // show cached results
             return;
         }
@@ -143,8 +148,13 @@ class Web extends Base
         // get topic from API
         $this->initMediaWiki();
         $this->data = $this->mediaWiki->links($this->query);
+        //$this->verbose('topic: mw:  query: ' . $this->query . ' - cached data: ' . print_r($this->data, true));
         if ($this->data) {
             $this->filesystem->set($this->query, json_encode($this->data)); // save results to cache
+            if (!empty($this->data['error'])) {
+                $this->error404('Topic Not Found', $this->query);
+                return;
+            }
             $this->topicPage($this->data); // show api results
             return;
         }
@@ -390,13 +400,19 @@ class Web extends Base
 
     /**
      * @param string $message
+     * @param string $reresh - refresh query link
      * @return void
      */
-    private function error404($message = 'Page Not Found')
+    private function error404($message = 'Page Not Found', $refresh = '')
     {
         header('HTTP/1.0 404 Not Found');
         $this->includeTemplate('header');
         print '<h1>Error 404</h1><h2>' . $message . '</h2>';
+        if ($refresh) {
+            print '<p><small><a href="' 
+            . $this->router->getHome() . 'refresh/' . $this->encodeLink($refresh)
+            . '">Attempt Refresh</a></small></p>';
+        }
         $this->includeTemplate('footer');
         exit;
     }
