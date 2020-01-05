@@ -17,18 +17,18 @@ class Filesystem extends Base
     {
         $path = $this->getPath($name);
         if (empty($path)) {
-            //$this->verbose('exists: false: no path');
+            $this->verbose('exists: EMPTY PATH: ' . $name);
             return false;
         }
         if (!file_exists($path)) {
-            //$this->verbose('exists: false: file not found');
+            //$this->verbose('exists: NOT FOUND: ' . $name);
             return false;
         }
         if (!is_readable($path)) {
-            //$this->verbose('exists: false: file not readable');
+            $this->verbose('exists: NOT READABLE: ' . $path);
             return false;
         }
-        //$this->verbose("exists: OK: name: $name path: $path");
+        //$this->verbose("exists: $name - $path");
         return true;
     }
 
@@ -39,20 +39,19 @@ class Filesystem extends Base
     public function get($name) 
     {
         if (!$this->exists($name)) {
-            //$this->verbose('get: ERROR: does not exist');
             return '';
         }
         $path = $this->getPath($name);
         if (empty($path)) {
-            //$this->verbose('get: ERROR: no path');
+            $this->verbose('get: ERROR: EMPTY PATH: ' . $path);
             return '';
         }
         $contents = @file_get_contents($path);
         if (empty($contents)) {
-            $this->verbose('get: ERROR: no contents');
+            $this->verbose('get: ERROR: NO CONENTS: ' . $path);
             return '';
         }
-        $this->verbose("get: OK: name: $name strlen.contents: " . strlen($contents));
+        $this->verbose("get: $name - $path - " . strlen($contents));
         return $contents;
     }
 
@@ -70,7 +69,7 @@ class Filesystem extends Base
         foreach ($parts as $part) {
             $dir .= $part . DIRECTORY_SEPARATOR;
             if (!is_dir($dir)) {
-                $this->verbose('set: mkdir: ' . $dir);
+                //$this->verbose('set: mkdir: ' . $dir);
                 mkdir($dir);
             }
         }
@@ -79,7 +78,7 @@ class Filesystem extends Base
             $this->verbose('set: FAILED write path: ' . $path);
             return false;
         }
-        $this->verbose("set: OK: name: $name bytes: $bytes  path: $path");
+        $this->verbose("set: $name - $path - $bytes");
         return true;
     }
 
@@ -112,14 +111,13 @@ class Filesystem extends Base
      */
     public function age($name)
     {
-        $this->verbose('age: name: ' . $name);
         if (!$this->exists($name)) {
-            $this->verbose('age: ERROR: does not exist');
+            $this->verbose('age: ERROR: NOT FOUND: ' . $name);
             return false;
         }
         $file = $this->getPath($name);
         if (!$file) {
-            $this->verbose('age: ERROR: path empty');
+            $this->verbose('age: ERROR: NO PATH: ' . $file);
             return false;
         }
         return filemtime($file);

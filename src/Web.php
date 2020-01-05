@@ -250,20 +250,33 @@ class Web extends Base
 
     private function setVarsMetaInformation()
     {
+        $this->verbose(
+            'setVarsMetaInformation:'
+            . ' topics:' . count($this->vars['topics'])
+            . ' topics_internal:' . count($this->vars['topics_internal']) 
+            . ' templates:' . count($this->vars['templates'])
+        );
         $this->vars['meta'] = [];
-        foreach ($this->vars['topics'] as $topic) {
-            $this->vars['meta'][$topic]['exists'] = $this->filesystem->exists($topic);
-        }
+        //foreach ($this->vars['topics'] as $topic) {
+        //    $this->vars['meta'][$topic]['exists'] = $this->filesystem->exists($topic);
+        //}
         foreach ($this->vars['topics_internal'] as $topic) {
-            $this->vars['meta'][$topic]['exists'] = $this->filesystem->exists($topic);
+            if (substr($topic, 0, 9) == 'Template:') {
+                $this->vars['meta'][$topic]['exists'] = $this->filesystem->exists($topic);
+            }
         }
         foreach ($this->vars['templates'] as $topic) {
-            $this->vars['meta'][$topic]['exists'] = $this->filesystem->exists($topic);
+            if (substr($topic, 0, 9) == 'Template:') {
+                $this->vars['meta'][$topic]['exists'] = $this->filesystem->exists($topic);
+            }
         }
     }
 
     private function removeTemplateTopics() {
         foreach ($this->vars['templates'] as $template) {
+            if ($template == $this->query) {
+                continue; // self
+            }
             if (empty($this->vars['meta'][$template]['exists'])) {
                 continue; // template not in cache
             }
@@ -279,6 +292,7 @@ class Web extends Base
                 if ($exTopic['ns'] == '0') {
                     // remove this template topic from master topic list
                     if (in_array($exTopic['*'], $this->vars['topics'])) {
+                        //$this->verbose('removeTemplateTopics: unset: ' . $exTopic['*']);
                         unset(
                             $this->vars['topics'][
                                 array_search($exTopic['*'], $this->vars['topics'])

@@ -21,18 +21,17 @@ class Mediawiki extends Base
     public function links($query)
     {
         $url = $this->api . $this->apiLinks . urlencode($query);
-        $this->verbose("getLink: query: $query url: $url");
         $jsonData = $this->getApi($url);
         if (!$jsonData) {
+            $this->verbose('links: ERROR: getApi call failed: ' . $url);
             return false;
         }
         $data = @json_decode($jsonData, true);
         if (empty($data) || !is_array($data)) {
-            $this->verbose('getLink: decode failed');
+            $this->verbose('links: ERROR: decode failed: ' . $query);
             return false;
         }
 
-        //$this->verbose($data);
         $result = [];
 
         // set title
@@ -55,7 +54,6 @@ class Mediawiki extends Base
             ? $data['parse']['templates']
             : [];
 
-        //$this->verbose($result);
         return $result;
     }
 
@@ -66,7 +64,6 @@ class Mediawiki extends Base
     public function search($query)
     {
         $url = $this->api . $this->apiSearch . urlencode($query);
-        $this->verbose("getSearch: query: $query url: $url");
         $jsonData = $this->getApi($url);
         if (!$jsonData) {
             return false;
@@ -96,17 +93,16 @@ class Mediawiki extends Base
      */
     private function getApi($url)
     {
-        $this->verbose('getApi: url: ' . $url);
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent); 
         $result = curl_exec($ch);
         curl_close($ch);
         if (empty($result)) {
-            $this->verbose('getApi: Error: empty result');
+            $this->verbose('getApi: ERROR: EMPTY RESULT: ' . $url);
             return false;
         }
-        $this->verbose('getApi: strlen.output: ' . strlen($result));
+        $this->verbose('getApi: OK: ' . $url . ' - ' . strlen($result));
         return $result;
     }
 }
