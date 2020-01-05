@@ -11,6 +11,7 @@ class Web extends Base
 {
     private $data = []; // topic data
     private $filesystem; // Attogram\Justrefs\Filesystem
+    private $mediaWiki; // Attogram\Justrefs\MediaWiki
     private $query = ''; // current query
     private $router; // Attogram\Router\Router
     private $title = ''; // current page title
@@ -46,11 +47,10 @@ class Web extends Base
 
     private function home()
     {
-        // get search query
-        $this->query = $this->router->getGet('q');
+        $this->query = $this->router->getGet('q'); // get search query
 
-        // No search query, show homepage
         if (!is_string($this->query) || !strlen(trim($this->query))) {
+            // No search query, show homepage
             $this->title = $this->siteName;
             $this->includeTemplate('header');
             $this->includeTemplate('home');
@@ -58,38 +58,28 @@ class Web extends Base
             return;
         }
 
-        // format search query
-        $this->query = trim($this->query);
+        $this->query = trim($this->query); // format search query
 
         // are search results in cache?
-        $this->filesystem = new Filesystem();
-        $this->filesystem->verbose = $this->verbose;
+        $this->initFilesystem();
         $filename = 'search:' . mb_strtolower($this->query);
-        $results = $this->filesystem->get($filename);
-        if ($results) {
-            // get cached results
-            $this->data = @json_decode($results, true);
-            if (is_array($this->data)) {
-                // show cached results
-                $this->searchResults($this->data);
-                return;
-            }
+        $this->data = $this->filesystem->get($filename);
+        if (is_array($this->data)) {
+            $this->searchResults($this->data); // show cached results
+            return;
         }
-
-        // get search results from API
-        $mediaWiki = new MediaWiki();
-        $mediaWiki->verbose = $this->verbose;
-        $this->data = $mediaWiki->search($this->query);
+        
+        // get search results from MediaWiki API
+        $this->initMediaWiki();
+        $this->data = $this->mediaWiki->search($this->query);
         if ($this->data) {
-            // save results to cache
-            $this->filesystem->set($filename, json_encode($this->data));
-            // show api results
-            $this->searchResults();
+            $this->filesystem->set($filename, json_encode($this->data)); // save results to cache
+            $this->searchResults(); // show api results
             return;
         }
 
         // no search results
-        //header('HTTP/1.0 404 Not Found');
+        header('HTTP/1.0 404 Not Found');
         $this->title = $this->siteName;
         $this->includeTemplate('header');
         $this->includeTemplate('home');
@@ -138,34 +128,24 @@ class Web extends Base
     private function topic()
     {
         $this->setQueryFromUrl();
-
         if (!strlen($this->query)) {
             $this->error404('Not Found');
         }
 
         // is topic in cache?
-        $this->filesystem = new Filesystem();
-        $this->filesystem->verbose = $this->verbose;
-        $results = $this->filesystem->get($this->query);
-        if ($results) {
-            // get cached results
-            $this->data = @json_decode($results, true);
-            if (is_array($this->data)) {
-                // show cached results
-                $this->topicPage($this->data);
-                return;
-            }
+        $this->initFilesystem();
+        $this->data = $this->filesystem->get($this->query);
+        if (is_array($this->data)) {
+            $this->topicPage($this->data); // show cached results
+            return;
         }
 
         // get topic from API
-        $mediaWiki = new MediaWiki();
-        $mediaWiki->verbose = $this->verbose;
-        $this->data = $mediaWiki->links($this->query);
+        $this->initMediaWiki();
+        $this->data = $this->mediaWiki->links($this->query);
         if ($this->data) {
-            // save results to cache
-            $this->filesystem->set($this->query, json_encode($this->data));
-            // show api results
-            $this->topicPage($this->data);
+            $this->filesystem->set($this->query, json_encode($this->data)); // save results to cache
+            $this->topicPage($this->data); // show api results
             return;
         }
 
@@ -198,6 +178,7 @@ class Web extends Base
         }
         $this->vars['dataAge'] = $this->dataAge;
         $this->vars['now'] = gmdate('Y-m-d H:i:s');
+
         $this->vars['refresh'] = $this->router->getHome() . 'refresh/' . $this->encodeLink($this->data['title']);
         $this->vars['h1'] = $this->data['title'];
 
@@ -252,7 +233,7 @@ class Web extends Base
     {
         $this->verbose(
             'setVarsMetaInformation:'
-            . ' topics:' . count($this->vars['topics'])
+            //. ' topics:' . count($this->vars['topics'])
             . ' topics_internal:' . count($this->vars['topics_internal']) 
             . ' templates:' . count($this->vars['templates'])
         );
@@ -278,30 +259,24 @@ class Web extends Base
                 continue; // self
             }
             if (empty($this->vars['meta'][$template]['exists'])) {
-                continue; // template not in cache
+                continue; // template not cached
             }
 
-            $templateJson = $this->filesystem->get($template);
-            $templateData = @json_decode($templateJson, true);
+            $templateData = $this->filesystem->get($template);
 
             if (empty($templateData['topics']) || !is_array($templateData['topics'])) {
-                continue; // error
+                continue; // error malformed data
             }
 
             foreach ($templateData['topics'] as $exTopic) {
-                if ($exTopic['ns'] == '0') {
+                if ($exTopic['ns'] == '0') { // main namespace only
                     // remove this template topic from master topic list
                     if (in_array($exTopic['*'], $this->vars['topics'])) {
                         //$this->verbose('removeTemplateTopics: unset: ' . $exTopic['*']);
-                        unset(
-                            $this->vars['topics'][
-                                array_search($exTopic['*'], $this->vars['topics'])
-                            ]
-                        );
+                        unset($this->vars['topics'][array_search($exTopic['*'], $this->vars['topics'])]);
                     }
                 }
             }
-            
         }
     }
 
@@ -312,9 +287,9 @@ class Web extends Base
             $this->error404('Refresh Topic Not Found');
         }
 
+        $this->initFilesystem();
+
         // does cache file exist?
-        $this->filesystem = new Filesystem();
-        $this->filesystem->verbose = $this->verbose;
         if (!$this->filesystem->exists($this->query)) {
             $this->error404('Cache File Not Found');
         }
@@ -344,8 +319,8 @@ class Web extends Base
                 $this->error404('Deletion Failed');
             }
             $this->includeTemplate('header');
-            print '<p>OK - cache deleted</p>';
-            print '<p><a href="' . $this->getLink($this->query) . '">' . $this->query . '</a></p>';
+            print '<p>OK - cache deleted</p>'
+                . '<p><a href="' . $this->getLink($this->query) . '">' . $this->query . '</a></p>';
             $this->includeTemplate('footer');
             return;
         }
@@ -436,6 +411,18 @@ class Web extends Base
             include($template);
             return;
         }
-        $this->verbose('includeTemplate: ERROR NOT FOUND: name:  ' . $template);
+        $this->verbose('includeTemplate: ERROR NOT FOUND: ' . $template);
+    }
+
+    private function initFilesystem()
+    {
+        $this->filesystem = new Filesystem();
+        $this->filesystem->verbose = $this->verbose;
+    }
+
+    private function initMediaWiki()
+    {
+        $this->mediaWiki = new MediaWiki();
+        $this->mediaWiki->verbose = $this->verbose;
     }
 }
