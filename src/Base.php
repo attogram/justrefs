@@ -7,9 +7,16 @@ declare(strict_types = 1);
 
 namespace Attogram\Justrefs;
 
+use function get_class;
+use function gmdate;
+use function htmlentities;
+use function microtime;
+use function print_r;
+use function round;
+
 class Base
 {
-    const VERSION = '0.1.7';
+    const VERSION = '0.1.8';
 
     public $verbose;
 

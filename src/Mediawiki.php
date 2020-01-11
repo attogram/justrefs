@@ -7,6 +7,15 @@ declare(strict_types = 1);
 
 namespace Attogram\Justrefs;
 
+use function curl_close;
+use function curl_exec;
+use function curl_init;
+use function curl_setopt;
+use function is_array;
+use function json_decode;
+use function print_r;
+use function urlencode;
+
 class Mediawiki extends Base
 {
     private $userAgent = 'JustRefsBot/' . self::VERSION;
@@ -20,15 +29,8 @@ class Mediawiki extends Base
      */
     public function links($query)
     {
-        $url = $this->api . $this->apiLinks . urlencode($query);
-        $jsonData = $this->getApi($url);
-        if (!$jsonData) {
-            $this->verbose('links: ERROR: getApi call failed: ' . $url);
-            return false;
-        }
-
-        $data = @json_decode($jsonData, true);
-        if (empty($data) || !is_array($data)) {
+        $data = $this->getApi($this->api . $this->apiLinks . urlencode($query));
+        if (!$data || !is_array($data)) {
             $this->verbose('links: ERROR: decode failed: ' . $query);
             return false;
         }
@@ -41,7 +43,7 @@ class Mediawiki extends Base
         ) {
             $result['title'] = $query;
             $result['error'] = true;
-            $this->verbose('links: ERROR: NOT FOUND: ' . $query);
+            $this->verbose('links: ERROR: 404 NOT FOUND: ' . $query);
             return $result;
         }
 
@@ -72,13 +74,8 @@ class Mediawiki extends Base
      */
     public function search($query)
     {
-        $url = $this->api . $this->apiSearch . urlencode($query);
-        $jsonData = $this->getApi($url);
-        if (!$jsonData) {
-            return false;
-        }
-        $data = @json_decode($jsonData, true);
-        if (empty($data)
+        $data = $this->getApi($this->api . $this->apiSearch . urlencode($query));
+        if (!$data
             || !is_array($data)
             || empty($data['query'])
             || empty($data['query']['search'])
@@ -98,21 +95,30 @@ class Mediawiki extends Base
 
     /**
      * @param string $url
-     * @return string|false
+     * @return array|false
      */
     private function getApi($url)
     {
+        if (empty($url) || !is_string($url)) {
+            $this->verbose('getApi: ERROR: invalid url: ' . print_r($url, true));
+            return false;
+        }
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent); 
-        $result = curl_exec($ch);
+        $jsonData = curl_exec($ch);
         curl_close($ch);
-        if (empty($result)) {
-            $this->verbose('getApi: ERROR: EMPTY RESULT: ' . $url);
+        if (empty($jsonData)) {
+            $this->verbose("getApi: ERROR: EMPTY RESULT: $url");
             return false;
         }
-        $this->verbose('getApi: OK: ' . $url . ' - ' . strlen($result));
-        $this->verbose($result);
-        return $result;
+        //$this->verbose('getApi: OK: ' . $url . ' - ' . strlen($jsonData));
+        $data = @json_decode($jsonData, true);
+        if (!is_array($data)) {
+            $this->verbose("getApi: ERROR: DECODE FAILED: url: $url jsonData: $jsonData");
+            return false;
+        }
+        $this->verbose("getApi: got: $url");
+        return $data;
     }
 }

@@ -7,6 +7,27 @@ declare(strict_types = 1);
 
 namespace Attogram\Justrefs;
 
+use function array_search;
+use function chr;
+use function count;
+use function gmdate;
+use function header;
+use function in_array;
+use function intval;
+use function is_array;
+use function is_readable;
+use function is_string;
+use function json_encode;
+use function mb_strtolower;
+use function rand;
+use function str_replace;
+use function sort;
+use function strlen;
+use function substr;
+use function time;
+use function trim;
+use function urldecode;
+
 class Web extends Base
 {
     private $data = []; // topic data
@@ -31,10 +52,23 @@ class Web extends Base
         $this->router->allow('/refresh/?/?', 'refresh');
         $this->router->allow('/refresh/?/?/?', 'refresh');
         $control = $this->router->match();
-        if (!$control || !method_exists($this, $control)) {
-            $this->error404('Page Not Found');
+        switch ($control) {
+            case 'topic':
+                $this->topic();
+                break;
+            case 'home':
+                $this->home();
+                break;
+            case 'about':
+                $this->about();
+                break;
+            case 'refresh':
+                $this->refresh();
+                break;
+            default:
+                $this->error404('Page Not Found');
+                break;
         }
-        $this->{$control}();
     }
 
     private function about()

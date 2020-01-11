@@ -7,6 +7,23 @@ declare(strict_types = 1);
 
 namespace Attogram\Justrefs;
 
+use function array_pop;
+use function count;
+use function explode;
+use function file_exists;
+use function file_get_contents;
+use function file_put_contents;
+use function filemtime;
+use function is_array;
+use function is_dir;
+use function is_readable;
+use function json_decode;
+use function md5;
+use function mkdir;
+use function strlen;
+use function substr;
+use function unlink;
+
 class Filesystem extends Base
 {
     /**
