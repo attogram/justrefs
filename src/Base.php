@@ -16,7 +16,7 @@ use function round;
 
 class Base
 {
-    const VERSION = '0.1.8';
+    const VERSION = '0.2.0';
 
     public $verbose;
 
@@ -30,8 +30,8 @@ class Base
     protected function verbose($message = '')
     {
         if ($this->verbose) {
-            print '<pre>' . gmdate('Y-m-d H:i:s') . ': ' . get_class($this) . ': ' 
-                . htmlentities(print_r($message, true)) . '</pre>';
+            print '<pre>' . gmdate('Y-m-d H:i:s') . ': ' . get_class($this) 
+                . ': ' . htmlentities(print_r($message, true)) . '</pre>';
         }
     }
 
