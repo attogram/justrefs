@@ -4,7 +4,7 @@
  * Topic page template
  */
 
-function printItems($name, $displayName, $webObject, $newTab = false) {
+function printItems($name, $displayName, $webObject, $externalLink = false) {
     if (!isset($webObject->vars[$name]) || !is_array($webObject->vars[$name])) {
         print '<a name="' . $name . '"><b>0</b> ' . $displayName . ':</a><br />';
         return;
@@ -12,11 +12,14 @@ function printItems($name, $displayName, $webObject, $newTab = false) {
     print '<a name="' . $name . '"><b>' . count($webObject->vars[$name]) . '</b> ' . $displayName . ':</a>';
     print '<ol>';
     foreach ($webObject->vars[$name] as $item) {
-        print '<li><a href="' . $webObject->getLink($item) . '"';
-        if ($newTab) {
-            print ' target="_blank"';
+        print '<li>';
+
+        if ($externalLink) {
+            print '<a href="' . $item . '" target="_blank">';
+        } else {
+            print '<a href="' . $webObject->getLink($item) . '">';
         }
-        print '>' . $item . '</a></li>';
+        print $item . '</a></li>';
     }
     print '</ol>';
 }
