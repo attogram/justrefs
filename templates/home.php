@@ -9,11 +9,12 @@ $menus = [
     'Society', 'Sport', 'Technology',
 ];
 
+print '<p>';
 foreach ($menus as $menu) {
     print '<a href="r/' . $menu . '">' . $menu . '</a> &nbsp; &nbsp;';
 }
 
-print '<br /><br />'
+print '</p>'
     . '<form>'
     . '<input name="q" value="" type="text" size="30">'
     . '<input type="submit" value="   search   ">'

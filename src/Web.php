@@ -19,7 +19,6 @@ use function is_readable;
 use function is_string;
 use function json_encode;
 use function mb_strtolower;
-use function print_r;
 use function rand;
 use function str_replace;
 use function sort;
@@ -394,23 +393,19 @@ class Web extends Base
         $this->vars['module'] = [];
 
         foreach ($this->data['templates'] as $item) {
-            //$this->verbose('setVarsTemplates: item: ' . print_r($item, true));
             switch ($item['ns']) {
                 case '0': // Main
                     if ($item['*'] != $this->query) {
                         $this->vars['main'][] = $item['*'];
-                        //$this->verbose('setVarsTemplates: save main: ' . $item['*']);
                     }
                     break;
                 case '10': // Template:
                     if (!in_array($item['*'], $this->vars['template'])) {
                         $this->vars['technical_template'][] = $item['*'];
-                        //$this->verbose('setVarsTemplates: save technical_template: ' .  $item['*']);
                     }
                     break;
                 case '828': // Module:
                     $this->vars['module'][] = $item['*'];
-                    //$this->verbose('setVarsTemplates: save module: ' .  $item['*']);
                     break;
                 default:
                     $this->verbose('setVarsTemplates: default: item: ' . $item['*']);
@@ -428,14 +423,10 @@ class Web extends Base
     {
         $this->vars['meta'] = [];
         foreach ($this->vars['template'] as $topic) {
-            //if (substr($topic, 0, 9) == 'Template:') {
-                $this->vars['meta'][$topic]['exists'] = $this->filesystem->exists($topic);
-            //}
+            $this->vars['meta'][$topic]['exists'] = $this->filesystem->exists($topic);
         }
         foreach ($this->vars['technical_template'] as $topic) {
-            //if (substr($topic, 0, 9) == 'Template:') {
-                $this->vars['meta'][$topic]['exists'] = $this->filesystem->exists($topic);
-            //}
+            $this->vars['meta'][$topic]['exists'] = $this->filesystem->exists($topic);
         }
         $this->verbose('setVarsMetaInformation: # vars.meta: ' . count($this->vars['meta']));
     }
@@ -451,13 +442,11 @@ class Web extends Base
             return;
         }
         foreach (array_merge($this->vars['template'], $this->vars['technical_template']) as $template) {
-            //$this->verbose('removeTemplateTopics: ' . $template);
             if ($template == $this->query) {
                 $this->verbose('removeTemplateTopics: self');
                 continue; // self
             }
             if (empty($this->vars['meta'][$template]['exists'])) {
-                //$this->verbose('removeTemplateTopics:template not cached');
                 continue; // template not cached
             }
             $templateData = $this->filesystem->get($template);
@@ -466,7 +455,6 @@ class Web extends Base
                 continue; // error malformed data
             }
             foreach ($templateData['topics'] as $exTopic) {
-                //$this->verbose('topics: ' . print_r($exTopic, true));
                 if ($exTopic['ns'] == '0') { // main namespace only
                     // remove this template topic from master topic list
                     if (in_array($exTopic['*'], $this->vars['main'])) {
@@ -566,17 +554,6 @@ class Web extends Base
     }
 
     /**
-     * @return string
-     */
-    public function getLink($query = '')
-    {
-        if (!$query) {
-            $query = $this->query;
-        }
-        return $this->router->getHome() . 'r/' . $this->encodeLink($query);
-    }
-
-    /**
      * @param string $message
      * @param string $reresh - refresh query link
      * @return void
@@ -618,5 +595,16 @@ class Web extends Base
     {
         $this->mediaWiki = new MediaWiki();
         $this->mediaWiki->verbose = $this->verbose;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLink($query = '')
+    {
+        if (!$query) {
+            $query = $this->query;
+        }
+        return $this->router->getHome() . 'r/' . $this->encodeLink($query);
     }
 }
