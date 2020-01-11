@@ -1,60 +1,74 @@
 body {
-    background-color: lightgrey;
-    font-family:sans-serif;
-    margin:0px;
-    padding:0px;
+  background-color:lightgrey;
+  font-family:monospace;
+  margin:0;
+  padding:0;
 }
 footer {
-    background-color: lightgrey;
-    padding:10px;
+  background-color:lightgrey;
+  padding:10px;
 }
 ol, ul {
-    font-family:monospace;
-    list-style-position: inside;
-    padding: 0;
-    margin: 0;
+  list-style-position:inside;
+  margin:0;
+  padding:0;
 }
 ol {
-    list-style-type: decimal-leading-zero;
-    padding: 7px 0 0 0;
+  list-style-type:decimal-leading-zero;
+  padding:7px 0 0 0;
 }
 ul li {
-    list-style-type: inherit;
+  list-style-type:inherit;
 }
 pre {
-    margin:0;
+  margin:0;
 }
 div {
-    background-color:white;
+  background-color:white;
 }
-a:link { text-decoration:none; color:darkblue}
-a:visited { text-decoration:none; color:darkblue }
-a:hover { background-color:yellow; color:black; }
-a:active { background-color:yellow; color:black; }
-a.missing { color: blueviolet; }
+a:link {
+  color:darkblue;
+  text-decoration:none;
+}
+a:visited {
+  color:darkblue;
+  text-decoration:none;
+}
+a:hover {
+  background-color:yellow;
+  color:black;
+}
+a:active {
+  background-color:yellow;
+  color:black;
+}
+a.missing {
+  color:blueviolet;
+}
 .head {
-    background-color: lightgrey;
-    padding:10px 10px 10px 10px;
+  background-color:lightgrey;
+  padding:10px 10px 10px 10px;
 }
 .body {
-    background-color: white;
-    padding:10px 10px 10px 30px;
+  background-color:white;
+  padding:10px 10px 10px 30px;
 }
 .flex-container {
-    display: flex;
+  display:flex;
 }
-.topics {
-    padding-right: 10px;
-    border-right: 1px solid grey;
+.lcol {
+  border-right:1px solid grey;
+  padding-right:10px;
 }
-.refs {
-    padding-left: 10px;
+.rcol {
+  padding-left:10px;
 }
 h1 {
-    margin:0;
-    padding-top:5px;
-    padding-bottom:10px;
+  font-family:sans-serif;
+  margin:0;
+  padding-top:5px;
+  padding-bottom:10px;
 }
 hr {
-    border-top: 1px dotted lightgrey;
+  border-top:1px dotted lightgrey;
 }

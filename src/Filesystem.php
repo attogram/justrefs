@@ -56,7 +56,7 @@ class Filesystem extends Base
     public function get($name) 
     {
         if (!$this->exists($name)) {
-            $this->verbose("get: ERROR: NOT FOUND: $name");
+            $this->verbose("get: NOT FOUND: $name");
             return false;
         }
         $path = $this->getPath($name);
@@ -75,7 +75,11 @@ class Filesystem extends Base
             return false;
         }
         $this->verbose("get: $name - $path - " . count($data));
-        //$this->verbose($data);
+        $this->verbose('get: title: ' . @$data['title']);
+        $this->verbose('get: error: ' . @$data['error']);
+        $this->verbose('get: # refs: ' . @count($data['refs']));
+        $this->verbose('get: # topics: ' . @count($data['topics']));
+        $this->verbose('get: # templates: ' . @count($data['templates']));
         return $data;
     }
 
@@ -86,8 +90,6 @@ class Filesystem extends Base
      */
     public function set($name, $value) 
     {
-        $this->verbose("set: $name - $value");
-    
         $path = $this->getPath($name);
         $parts = explode(DIRECTORY_SEPARATOR, $path);
         array_pop($parts);

@@ -19,6 +19,7 @@ use function is_readable;
 use function is_string;
 use function json_encode;
 use function mb_strtolower;
+use function print_r;
 use function rand;
 use function str_replace;
 use function sort;
@@ -30,14 +31,18 @@ use function urldecode;
 
 class Web extends Base
 {
+    public $vars = []; // template vars
+
     private $data = []; // topic data
     private $filesystem; // Attogram\Justrefs\Filesystem
     private $mediaWiki; // Attogram\Justrefs\MediaWiki
     private $query = ''; // current query
     private $router; // Attogram\Router\Router
     private $title = ''; // current page title
-    private $vars = []; // template vars
 
+    /**
+     * Route the current web request
+     */
     public function route()
     {
         $this->startTimer('page');
@@ -46,18 +51,24 @@ class Web extends Base
         $this->router->allow('/r/?', 'topic');
         $this->router->allow('/r/?/?', 'topic');
         $this->router->allow('/r/?/?/?', 'topic');
+        $this->router->allow('/r/?/?/?/?', 'topic');
         $this->router->allow('/about', 'about');
         $this->router->allow('/refresh', 'refresh');
         $this->router->allow('/refresh/?', 'refresh');
         $this->router->allow('/refresh/?/?', 'refresh');
         $this->router->allow('/refresh/?/?/?', 'refresh');
-        $control = $this->router->match();
-        switch ($control) {
+        $this->router->allow('/refresh/?/?/?/?', 'refresh');
+        switch ($this->router->match()) {
             case 'topic':
                 $this->topic();
                 break;
             case 'home':
-                $this->home();
+                $this->setQueryFromGet();
+                if ($this->query) {
+                    $this->search();
+                    break;
+                }
+                $this->homepage();
                 break;
             case 'about':
                 $this->about();
@@ -71,6 +82,14 @@ class Web extends Base
         }
     }
 
+    private function homepage()
+    {
+        $this->title = $this->siteName;
+        $this->includeTemplate('header');
+        $this->includeTemplate('home');
+        $this->includeTemplate('footer');
+    }
+
     private function about()
     {
         $this->title = 'About this site';
@@ -79,39 +98,24 @@ class Web extends Base
         $this->includeTemplate('footer');
     }
 
-    private function home()
+    private function search()
     {
-        $this->query = $this->router->getGet('q'); // get search query
-
-        if (!is_string($this->query) || !strlen(trim($this->query))) {
-            // No search query, show homepage
-            $this->title = $this->siteName;
-            $this->includeTemplate('header');
-            $this->includeTemplate('home');
-            $this->includeTemplate('footer');
-            return;
-        }
-
-        $this->query = trim($this->query); // format search query
-
-        // are search results in cache?
+        // get search results from cache
         $this->initFilesystem();
         $filename = 'search:' . mb_strtolower($this->query);
         $this->data = $this->filesystem->get($filename);
         if (is_array($this->data)) {
-            $this->searchResults($this->data); // show cached results
+            $this->searchResults($this->data); // show results from cached file
             return;
         }
-        
         // get search results from MediaWiki API
         $this->initMediaWiki();
         $this->data = $this->mediaWiki->search($this->query);
         if ($this->data) {
             $this->filesystem->set($filename, json_encode($this->data)); // save results to cache
-            $this->searchResults(); // show api results
+            $this->searchResults(); // show results from api response
             return;
         }
-
         // no search results
         header('HTTP/1.0 404 Not Found');
         $this->title = $this->siteName;
@@ -133,9 +137,86 @@ class Web extends Base
         $this->includeTemplate('footer');
     }
 
+    private function topic()
+    {
+        $this->setQueryFromUrl();
+        if (!$this->query) {
+            $this->error404('Not Found');
+        }
+
+        // get topic from Cache
+        $this->setDataFromCache();
+        if ($this->data) {
+            if (!empty($this->data['error'])) {
+                $this->error404('Topic Not Found', $this->query);
+                return;
+            }
+            $this->topicPage(); // show cached results
+            return;
+        }
+
+        // get topic from API
+        $this->setDataFromApi();
+        if ($this->data) {
+            $this->filesystem->set($this->query, json_encode($this->data)); // save results to cache
+            if (!empty($this->data['error'])) {
+                $this->error404('Topic Not Found', $this->query);
+                return;
+            }
+            $this->topicPage(); // show api results
+            return;
+        }
+
+        $this->error404('Topic Not Found');
+    }
+
+    /**
+     * set $this->data to array from cached file, or empty array
+     */
+    private function setDataFromCache()
+    {
+        $this->initFilesystem();
+        $this->data = $this->filesystem->get($this->query);
+        if (!is_array($this->data)) {
+            $this->data = [];
+        }
+    }
+
+    /**
+     * set $this->data to array from api response, or empty array
+     */
+    private function setDataFromApi()
+    {
+        $this->initMediaWiki();
+        $this->data = $this->mediaWiki->links($this->query);
+        if (!is_array($this->data)) {
+            $this->data = [];
+        }
+    }
+
+    /**
+     * set $this->query to string from _GET['q'], or empty string
+     */
+    private function setQueryFromGet()
+    {
+        $this->query = $this->router->getGet('q');
+        if (!$this->query || !is_string($this->query)) {
+            $this->query = '';
+            return;
+        }
+        $this->query = trim($this->query);
+        if (!strlen($this->query)) {
+            $this->query = '';
+            return;
+        }
+        return $this->query;
+    }
+
+    /**
+     * set $this->query to string from URL elements, or empty string
+     */
     private function setQueryFromUrl()
     {
-        // get query from url
         $this->query = $this->router->getVar(0);
         if ($this->router->getVar(1)) {
             $this->query .= '/' . $this->router->getVar(1);
@@ -143,6 +224,9 @@ class Web extends Base
                 $this->query .= '/' . $this->router->getVar(2);
                 if ($this->router->getVar(3)) {
                     $this->query .= '/' . $this->router->getVar(3);
+                    if ($this->router->getVar(4)) {
+                        $this->query .= '/' . $this->router->getVar(4);
+                    }
                 }
             }
         }
@@ -159,43 +243,6 @@ class Web extends Base
         }
     }
 
-    private function topic()
-    {
-        $this->setQueryFromUrl();
-        if (!strlen($this->query)) {
-            $this->error404('Not Found');
-        }
-
-        // is topic in cache?
-        $this->initFilesystem();
-        $this->data = $this->filesystem->get($this->query);
-        //$this->verbose('topic: fs: query: ' . $this->query . ' - cached data: ' . print_r($this->data, true));
-        if (is_array($this->data)) {
-            if (!empty($this->data['error'])) {
-                $this->error404('Topic Not Found', $this->query);
-                return;
-            }
-            $this->topicPage($this->data); // show cached results
-            return;
-        }
-
-        // get topic from API
-        $this->initMediaWiki();
-        $this->data = $this->mediaWiki->links($this->query);
-        //$this->verbose('topic: mw:  query: ' . $this->query . ' - cached data: ' . print_r($this->data, true));
-        if ($this->data) {
-            $this->filesystem->set($this->query, json_encode($this->data)); // save results to cache
-            if (!empty($this->data['error'])) {
-                $this->error404('Topic Not Found', $this->query);
-                return;
-            }
-            $this->topicPage($this->data); // show api results
-            return;
-        }
-
-        $this->error404('Topic Not Found');
-    }
-
     private function topicPage()
     {
         // set template variables
@@ -205,16 +252,15 @@ class Web extends Base
         $this->setVarsMetaInformation();
         $this->removeTemplateTopics();
         
-        // sort lists alphabetically
-        sort($this->vars['topics']);
-        sort($this->vars['topics_internal']);
-        sort($this->vars['refs']);
-        sort($this->vars['templates']);
+        // sort var lists alphabetically
+        foreach (array_keys($this->vars) as $index) {
+            sort($this->vars[$index]);
+        }
 
-        // extraction source url
+        // set Extraction source url
         $this->vars['source'] = 'https://en.wikipedia.org/wiki/' . $this->encodeLink($this->data['title']);
 
-        // Data and Cache age
+        // set Data and Cache age
         $this->dataAge = '?';
         $age = $this->filesystem->age($this->data['title']);
         if ($age) {
@@ -226,7 +272,7 @@ class Web extends Base
         $this->vars['refresh'] = $this->router->getHome() . 'refresh/' . $this->encodeLink($this->data['title']);
         $this->vars['h1'] = $this->data['title'];
 
-        // display page
+        // Display page
         $this->title = $this->data['title'] . ' - ' . $this->siteName;
         $this->includeTemplate('header');
         $this->includeTemplate('topic');
@@ -235,21 +281,98 @@ class Web extends Base
 
     private function setVarsTopics()
     {
-        $this->vars['topics'] = [];
-        $this->vars['topics_internal'] = [];
+        $this->vars['main'] = [];
+        $this->vars['template'] = [];
+        $this->vars['portal'] = [];
+        $this->vars['wikipedia'] = [];
+        $this->vars['help'] = [];
+        $this->vars['module'] = [];
+        $this->vars['draft'] = [];
+        $this->vars['user'] = [];
+        $this->vars['talk'] = [];
+        $this->vars['user_talk'] = [];
+        $this->vars['wikipedia_talk'] = [];
+        $this->vars['help_talk'] = [];
+        //$this->vars[''] = [];
+
         foreach ($this->data['topics'] as $topic) {
             switch ($topic['ns']) { // @see https://en.wikipedia.org/wiki/Wikipedia:Namespace
-                case '0': // Mainspace
-                    $this->vars['topics'][$topic['*']] = $topic['*'];
+                case '0':  // Mainspace
+                    $this->vars['main'][] = $topic['*'];
                     break;
-                case '6': // File
+                case '1':  // Talk
+                    $this->vars['talk'][] = $topic['*'];
+                    break;
+                case '2':  // User
+                    $this->vars['user'][] = $topic['*'];
+                    break;
+                case '3':  // User_talk
+                    $this->vars['user_talk'][] = $topic['*'];
+                    break;
+                case '4':  // Wikipedia
+                    $this->vars['wikipedia'][] = $topic['*'];
+                    break;
+                case '5':  // Wikipedia_talk
+                    $this->vars['wikipedia_talk'][] = $topic['*'];
+                    break;
+                case '6':  // File
+                    break; // exclude
+                case '7':  // File_talk
+                    break; // exclude
+                case '8':  // MediaWiki
+                    break; // exclude
+                case '9':  // MediaWiki_talk
+                    break; // exclude
+                case '10': // Template
+                    $this->vars['template'][] = $topic['*'];
+                    break;
+                case '11': // Template_talk
+                    $this->vars['template_talk'][] = $topic['*'];
+                    break;
+                case '12': // Help
+                    $this->vars['help'][] = $topic['*'];
+                    break;
+                case '13': // Help_talk
+                    $this->vars['help_talk'][] = $topic['*'];
+                    break;
                 case '14': // Category
                     break; // exclude
-                default:
-                    $this->vars['topics_internal'][$topic['*']] = $topic['*'];
+                case '15': // Category_talk
+                    break; // exclude
+                case '100': // Portal
+                    $this->vars['portal'][] = $topic['*'];
                     break;
+                case '101': // Portal_talk
+                    $this->vars['portal_talk'][] = $topic['*'];
+                    break;
+                case '108': // Book
+                    break;
+                case '109': // Book_talk
+                    break;
+                case '118': // Draft
+                    $this->vars['draft'][] = $topic['*'];
+                    break;
+                case '119': // Draft_talk
+                    $this->vars['draft_talk'][] = $topic['*'];
+                    break;
+                case '710': // TimedText
+                    break; // exclude
+                case '711': // TimedText_talk
+                    break; // exclude
+                case '828': // Module
+                    $this->vars['module'][] = $topic['*'];
+                    break;
+                case '829': // Module_talk
+                    $this->vars['module_talk'][] = $topic['*'];
+                    break;
+                default:
+                    break; // exclucde
             }                
         }
+        $this->verbose('setVarsTopics: # this.vars: ' . count($this->vars));
+        $this->verbose('setVarsTopics: # vars.main: ' . count($this->vars['main']));
+        $this->verbose('setVarsTopics: # vars.template: ' . count($this->vars['template']));
+
     }
 
     private function setVarsRefs()
@@ -261,63 +384,94 @@ class Web extends Base
             }
             $this->vars['refs'][] = $ref;
         }
+        $this->verbose('setVarsRefs: # vars.refs: ' . count($this->vars['refs']));
+
     }
 
     private function setVarsTemplates()
     {
-        $this->vars['templates'] = [];
-        foreach ($this->data['templates'] as $template) {
-            if ($template['ns'] == '10') {
-                $this->vars['templates'][] = $template['*'];
+        $this->vars['technical_template'] = [];
+        $this->vars['module'] = [];
+
+        foreach ($this->data['templates'] as $item) {
+            //$this->verbose('setVarsTemplates: item: ' . print_r($item, true));
+            switch ($item['ns']) {
+                case '0': // Main
+                    if ($item['*'] != $this->query) {
+                        $this->vars['main'][] = $item['*'];
+                        //$this->verbose('setVarsTemplates: save main: ' . $item['*']);
+                    }
+                    break;
+                case '10': // Template:
+                    if (!in_array($item['*'], $this->vars['template'])) {
+                        $this->vars['technical_template'][] = $item['*'];
+                        //$this->verbose('setVarsTemplates: save technical_template: ' .  $item['*']);
+                    }
+                    break;
+                case '828': // Module:
+                    $this->vars['module'][] = $item['*'];
+                    //$this->verbose('setVarsTemplates: save module: ' .  $item['*']);
+                    break;
+                default:
+                    $this->verbose('setVarsTemplates: default: item: ' . $item['*']);
+                    $this->verbose('setVarsTemplates: default: ns: ' . $item['ns']);
+                    break;
             }
         }
+        $this->verbose('setVarsTemplates: # vars.main: ' . count($this->vars['main']));
+        $this->verbose('setVarsTemplates: # vars.technical_template: ' . count($this->vars['technical_template']));
+        $this->verbose('setVarsTemplates: # vars.module: ' . count($this->vars['module']));
+
     }
 
     private function setVarsMetaInformation()
     {
-        $this->verbose(
-            'setVarsMetaInformation:'
-            //. ' topics:' . count($this->vars['topics'])
-            . ' topics_internal:' . count($this->vars['topics_internal']) 
-            . ' templates:' . count($this->vars['templates'])
-        );
         $this->vars['meta'] = [];
-        //foreach ($this->vars['topics'] as $topic) {
-        //    $this->vars['meta'][$topic]['exists'] = $this->filesystem->exists($topic);
-        //}
-        foreach ($this->vars['topics_internal'] as $topic) {
-            if (substr($topic, 0, 9) == 'Template:') {
+        foreach ($this->vars['template'] as $topic) {
+            //if (substr($topic, 0, 9) == 'Template:') {
                 $this->vars['meta'][$topic]['exists'] = $this->filesystem->exists($topic);
-            }
+            //}
         }
-        foreach ($this->vars['templates'] as $topic) {
-            if (substr($topic, 0, 9) == 'Template:') {
+        foreach ($this->vars['technical_template'] as $topic) {
+            //if (substr($topic, 0, 9) == 'Template:') {
                 $this->vars['meta'][$topic]['exists'] = $this->filesystem->exists($topic);
-            }
+            //}
         }
+        $this->verbose('setVarsMetaInformation: # vars.meta: ' . count($this->vars['meta']));
     }
 
     private function removeTemplateTopics() {
-        foreach ($this->vars['templates'] as $template) {
+        //$this->verbose('removeTemplateTopics');
+        if (empty($this->vars['main'])) {
+            $this->verbose('removeTemplateTopics: empty vars.main');
+            return;
+        }
+        if (empty($this->vars['template']) && $this->vars['technical_template']) {
+            $this->verbose('removeTemplateTopics: empty vars.template and vars.technical_template');
+            return;
+        }
+        foreach (array_merge($this->vars['template'], $this->vars['technical_template']) as $template) {
+            //$this->verbose('removeTemplateTopics: ' . $template);
             if ($template == $this->query) {
+                $this->verbose('removeTemplateTopics: self');
                 continue; // self
             }
             if (empty($this->vars['meta'][$template]['exists'])) {
+                //$this->verbose('removeTemplateTopics:template not cached');
                 continue; // template not cached
             }
-
             $templateData = $this->filesystem->get($template);
-
             if (empty($templateData['topics']) || !is_array($templateData['topics'])) {
+                $this->verbose('removeTemplateTopics: ERROR: malformed data');
                 continue; // error malformed data
             }
-
             foreach ($templateData['topics'] as $exTopic) {
+                //$this->verbose('topics: ' . print_r($exTopic, true));
                 if ($exTopic['ns'] == '0') { // main namespace only
                     // remove this template topic from master topic list
-                    if (in_array($exTopic['*'], $this->vars['topics'])) {
-                        //$this->verbose('removeTemplateTopics: unset: ' . $exTopic['*']);
-                        unset($this->vars['topics'][array_search($exTopic['*'], $this->vars['topics'])]);
+                    if (in_array($exTopic['*'], $this->vars['main'])) {
+                        //$this->verbose('removeTemplateTopics: ' . $template . ' unset: ' . $exTopic['*']);
+                        unset($this->vars['main'][array_search($exTopic['*'], $this->vars['main'])]);
                     }
                 }
             }
@@ -330,35 +484,28 @@ class Web extends Base
         if (!strlen($this->query)) {
             $this->error404('Refresh Topic Not Found');
         }
-
         $this->initFilesystem();
-
         // does cache file exist?
         if (!$this->filesystem->exists($this->query)) {
             $this->error404('Cache File Not Found');
         }
-
         if (!empty($_POST)) {
             $answer = isset($_POST['d']) ? $_POST['d'] : '';
             if (!strlen($answer)) {
                 $this->error404('Answer Not Found');
             }
-
             $submitTime = !empty($_POST['c']) ? intval($_POST['c']) : false;
             if (!$submitTime || (time() - $submitTime) > 60) {
                 $this->error404('Request Timed Out');
             }
-
             $one = isset($_POST['a']) ? $_POST['a'] : '';
             $two = isset($_POST['b']) ? $_POST['b'] : '';
             if (!strlen($one) || !strlen($two)) {
                 $this->error404('Invalid Request');
             }
-
             if (($one + $two) != $answer) {
                 $this->error404('Invalid Answer');
             }
-            
             if (!$this->filesystem->delete($this->query)) {
                 $this->error404('Deletion Failed');
             }
@@ -373,13 +520,11 @@ class Web extends Base
         $this->includeTemplate('header');
         print '<p><b><a href="' . $this->getLink($this->query) . '">' . $this->query 
             . '</a></b> is currently cached.</p>';
-
         $letterOne = chr(rand(65,90));
         $numOne = rand(0, 10);
         $letterTwo = chr(rand(65,90));
         $numTwo = rand(0, 10);
         $answer = $numOne + $numTwo;
-
         print '<form method="POST">'
             . '<input type="hidden" name="a" value="' . $numOne . '">'
             . '<input type="hidden" name="b" value="' . $numTwo . '">'
@@ -390,7 +535,6 @@ class Web extends Base
             . '<br /><br />'
             . '<input type="submit" value="    Delete Cache    ">'
             . '</form>';
-
         $this->includeTemplate('footer');
     }
 
@@ -424,7 +568,7 @@ class Web extends Base
     /**
      * @return string
      */
-    private function getLink($query = '')
+    public function getLink($query = '')
     {
         if (!$query) {
             $query = $this->query;
@@ -464,7 +608,7 @@ class Web extends Base
         $this->verbose('includeTemplate: ERROR NOT FOUND: ' . $template);
     }
 
-    private function initFilesystem()
+    protected function initFilesystem()
     {
         $this->filesystem = new Filesystem();
         $this->filesystem->verbose = $this->verbose;

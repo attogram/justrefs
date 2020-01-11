@@ -12,6 +12,7 @@ use function curl_exec;
 use function curl_init;
 use function curl_setopt;
 use function is_array;
+use function is_string;
 use function json_decode;
 use function print_r;
 use function urlencode;
@@ -49,21 +50,25 @@ class Mediawiki extends Base
 
         // set title
         $result['title'] = $data['parse']['title'];
-
-        // set related topics 
-        $result['topics'] = isset($data['parse']['links'])
-            ? $data['parse']['links']
-            : [];
+        $this->verbose('links: title: ' . $result['title']);
 
         // set reference links
         $result['refs'] = isset($data['parse']['externallinks'])
             ? $data['parse']['externallinks']
             : [];
-        
+        $this->verbose('links: refs: ' . count($result['refs']));
+
+        // set related topics 
+        $result['topics'] = isset($data['parse']['links'])
+            ? $data['parse']['links']
+            : [];
+        $this->verbose('links: topics: ' . count($result['topics']));
+
         // set templates
         $result['templates'] = isset($data['parse']['templates'])
             ? $data['parse']['templates']
             : [];
+        $this->verbose('links: templates: ' . count($result['templates']));
 
         return $result;
     }
