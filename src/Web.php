@@ -575,14 +575,14 @@ class Web extends Base
     /**
      * @param string $name
      */
-    private function includeTemplate($name)
+    public function includeTemplate($name)
     {
         $template = '../templates/' . $name . '.php';
         if (is_readable($template)) {
             include($template);
             return;
         }
-        $this->verbose('includeTemplate: ERROR NOT FOUND: ' . $template);
+        //$this->verbose('includeTemplate: ERROR NOT FOUND: ' . $template);
     }
 
     protected function initFilesystem()

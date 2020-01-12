@@ -3,11 +3,13 @@
  * Just Refs
  * Header template
  * 
- * @uses $this
+ * @uses $this - Attogram\Justrefs\Web
  */
 ?><!doctype html>
 <html lang="en">
-<head><meta charset="UTF-8">
+<head>
+<?php $this->includeTemplate('custom' . DIRECTORY_SEPARATOR . 'head.top') ?>    
+<meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="apple-touch-icon" sizes="180x180" href="<?= $this->router->getHome() ?>apple-touch-icon.png">
