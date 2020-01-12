@@ -12,25 +12,30 @@ function printItems($name, $displayName, $webObject, $externalLink = false) {
     print '<a name="' . $name . '"><b>' . count($webObject->vars[$name]) . '</b> ' . $displayName . ':</a>';
     print '<ol>';
     foreach ($webObject->vars[$name] as $item) {
-        print '<li>';
-        if ($name == 'main' && in_array($item, $webObject->vars['main_missing'])) {
-          // wiki page has link to non-existing page (red link)
-          print '<span class="red">' . $item . '</span></li>';
+
+        if (in_array($item, $webObject->vars['missing'])) {
+          // Link to non-existing internal page (red link)
+          print '<li><span class="red">' . $item . '</span></li>';
           continue;
         }
+
         if ($externalLink) {
-            print '<a href="' . $item . '" target="_blank">';
-        } else {
-            $class = '';
-            //if ($name == 'template' || $name == 'technical_template') {
-            if ($name == 'template') {
-                if (!in_array($item, $webObject->vars['exists'])) {
-                  $class = ' class="missing"';
-                }
+          // Link to external reference
+          print '<li><a href="' . $item . '" target="_blank">' 
+              . $item . '</li>';
+          continue;
+        } 
+
+        // Link to internal page
+        $class = '';
+        //if ($name == 'template' || $name == 'technical_template') {
+        if ($name == 'template') {
+            if (!in_array($item, $webObject->vars['exists'])) {
+                $class = ' class="missing"';
             }
-            print '<a href="' . $webObject->getLink($item) . '"' . $class . '>';
         }
-        print $item . '</a></li>';
+        print '<li><a href="' . $webObject->getLink($item) . '"' 
+          . $class . '>' . $item . '</a></li>';
     }
     print '</ol>';
 }

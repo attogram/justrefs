@@ -280,8 +280,8 @@ class Web extends Base
 
     private function setVarsTopics()
     {
+        $this->vars['missing'] = [];
         $this->vars['main'] = [];
-        $this->vars['main_missing'] = [];
         $this->vars['template'] = [];
         $this->vars['portal'] = [];
         $this->vars['wikipedia'] = [];
@@ -293,15 +293,15 @@ class Web extends Base
         $this->vars['user_talk'] = [];
         $this->vars['wikipedia_talk'] = [];
         $this->vars['help_talk'] = [];
-        //$this->vars[''] = [];
 
         foreach ($this->data['topics'] as $topic) {
-            switch ($topic['ns']) { // @see https://en.wikipedia.org/wiki/Wikipedia:Namespace
+            if (!isset($topic['exists'])) {
+                // page does not exist
+                $this->vars['missing'][] = $topic['*'];
+            }
+            // @see https://en.wikipedia.org/wiki/Wikipedia:Namespace
+            switch ($topic['ns']) {
                 case '0':  // Mainspace
-                    //$this->verbose('main: '  . print_r($topic, true));
-                    if (!isset($topic['exists'])) {
-                        $this->vars['main_missing'][] = $topic['*'];
-                    }
                     $this->vars['main'][] = $topic['*'];
                     break;
                 case '1':  // Talk
@@ -375,8 +375,8 @@ class Web extends Base
         }
         $this->verbose('setVarsTopics: # this.vars: ' . count($this->vars));
         $this->verbose('setVarsTopics: # vars.main: ' . count($this->vars['main']));
-        $this->verbose('setVarsTopics: # vars.main_missing: ' . count($this->vars['main_missing']));
         $this->verbose('setVarsTopics: # vars.template: ' . count($this->vars['template']));
+        $this->verbose('setVarsTopics: # vars.missing: ' . count($this->vars['missing']));
     }
 
     private function setVarsRefs()
