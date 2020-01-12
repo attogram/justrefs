@@ -13,6 +13,11 @@ function printItems($name, $displayName, $webObject, $externalLink = false) {
     print '<ol>';
     foreach ($webObject->vars[$name] as $item) {
         print '<li>';
+        if ($name == 'main' && in_array($item, $webObject->vars['main_missing'])) {
+          // wiki page has link to non-existing page (red link)
+          print '<span class="red">' . $item . '</span></li>';
+          continue;
+        }
         if ($externalLink) {
             print '<a href="' . $item . '" target="_blank">';
         } else {

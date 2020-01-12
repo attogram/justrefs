@@ -74,3 +74,6 @@ h1, p {
 hr {
   border-top:1px dotted lightgrey;
 }
+.red {
+  color:darkred;
+}
