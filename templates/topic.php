@@ -13,23 +13,28 @@ function printItems($name, $displayName, $webObject, $externalLink = false) {
     print '<ol>';
     foreach ($webObject->vars[$name] as $item) {
         print '<li>';
-
         if ($externalLink) {
             print '<a href="' . $item . '" target="_blank">';
         } else {
-            print '<a href="' . $webObject->getLink($item) . '">';
+            $class = '';
+            //if ($name == 'template' || $name == 'technical_template') {
+            if ($name == 'template') {
+                if (!in_array($item, $webObject->vars['exists'])) {
+                  $class = ' class="missing"';
+                }
+            }
+            print '<a href="' . $webObject->getLink($item) . '"' . $class . '>';
         }
         print $item . '</a></li>';
     }
     print '</ol>';
 }
-
 ?>
 <h1><?= $this->vars['h1'] ?></h1>
 <hr />
 <ul>
   <li><a href="#refs"><b><?= count($this->vars['refs']) ?></b> References</a>,
-      <a href="#topics"><b><?= count($this->vars['main']) ?></b> Topics</a></li>
+      <a href="#main"><b><?= count($this->vars['main']) ?></b> Topics</a></li>
   <li><a href="#template"><b><?= count($this->vars['template']) ?></b> Templates</a>,
       <a href="#portal"><b><?= count($this->vars['portal']) ?></b> Portals</a>,
       <a href="#wikipedia"><b><?= count($this->vars['wikipedia']) ?></b> Wikipedia</a>,

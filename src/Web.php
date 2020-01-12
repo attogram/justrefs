@@ -248,7 +248,7 @@ class Web extends Base
         $this->setVarsTopics();
         $this->setVarsRefs();
         $this->setVarsTemplates();
-        $this->setVarsMetaInformation();
+        $this->setVarsExists();
         $this->removeTemplateTopics();
         
         // sort var lists alphabetically
@@ -390,7 +390,6 @@ class Web extends Base
     private function setVarsTemplates()
     {
         $this->vars['technical_template'] = [];
-        $this->vars['module'] = [];
 
         foreach ($this->data['templates'] as $item) {
             switch ($item['ns']) {
@@ -409,26 +408,26 @@ class Web extends Base
                     break;
                 default:
                     $this->verbose('setVarsTemplates: default: item: ' . $item['*']);
-                    $this->verbose('setVarsTemplates: default: ns: ' . $item['ns']);
+                    //$this->verbose('setVarsTemplates: default: ns: ' . $item['ns']);
                     break;
             }
         }
-        $this->verbose('setVarsTemplates: # vars.main: ' . count($this->vars['main']));
-        $this->verbose('setVarsTemplates: # vars.technical_template: ' . count($this->vars['technical_template']));
-        $this->verbose('setVarsTemplates: # vars.module: ' . count($this->vars['module']));
+        //$this->verbose('setVarsTemplates: # vars.main: ' . count($this->vars['main']));
+        //$this->verbose('setVarsTemplates: # vars.technical_template: ' . count($this->vars['technical_template']));
+        //$this->verbose('setVarsTemplates: # vars.module: ' . count($this->vars['module']));
 
     }
 
-    private function setVarsMetaInformation()
+    private function setVarsExists()
     {
-        $this->vars['meta'] = [];
-        foreach ($this->vars['template'] as $topic) {
-            $this->vars['meta'][$topic]['exists'] = $this->filesystem->exists($topic);
+        $this->vars['exists'] = [];
+        //foreach (array_merge($this->vars['template'], $this->vars['technical_template']) as $item) {
+        foreach ($this->vars['template'] as $item) {
+            if ($this->filesystem->exists($item)) {
+                $this->vars['exists'][] = $item;
+            }
         }
-        foreach ($this->vars['technical_template'] as $topic) {
-            $this->vars['meta'][$topic]['exists'] = $this->filesystem->exists($topic);
-        }
-        $this->verbose('setVarsMetaInformation: # vars.meta: ' . count($this->vars['meta']));
+        $this->verbose('setVarsExists: # vars.exists: ' . count($this->vars['exists']));
     }
 
     private function removeTemplateTopics() {
@@ -441,12 +440,13 @@ class Web extends Base
             $this->verbose('removeTemplateTopics: empty vars.template and vars.technical_template');
             return;
         }
-        foreach (array_merge($this->vars['template'], $this->vars['technical_template']) as $template) {
+        //foreach (array_merge($this->vars['template'], $this->vars['technical_template']) as $template) {
+        foreach ($this->vars['template'] as $template) {
             if ($template == $this->query) {
                 $this->verbose('removeTemplateTopics: self');
                 continue; // self
             }
-            if (empty($this->vars['meta'][$template]['exists'])) {
+            if (!in_array($template, $this->vars['exists'])) {
                 continue; // template not cached
             }
             $templateData = $this->filesystem->get($template);
