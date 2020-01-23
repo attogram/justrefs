@@ -16,7 +16,7 @@ use function round;
 
 class Base
 {
-    const VERSION = '0.3.1';
+    const VERSION = '0.3.2';
 
     public $verbose;
 
