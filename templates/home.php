@@ -1,6 +1,6 @@
 <?php
 /**
- * Just Refs
+ * Just Refs - https://github.com/attogram/justrefs
  * Home Page template
  */
 $menus = [

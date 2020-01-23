@@ -1,6 +1,6 @@
 <?php
 /**
- * Just Refs
+ * Just Refs - https://github.com/attogram/justrefs
  * Base Class
  */
 declare(strict_types = 1);

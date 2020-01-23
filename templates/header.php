@@ -1,6 +1,6 @@
 <?php
 /**
- * Just Refs
+ * Just Refs - https://github.com/attogram/justrefs
  * Header template
  * 
  * @uses $this - Attogram\Justrefs\Web
