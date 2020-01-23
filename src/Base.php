@@ -1,6 +1,6 @@
 <?php
 /**
- * Just Refs
+ * Just Refs - https://github.com/attogram/justrefs
  * Base Class
  */
 declare(strict_types = 1);
@@ -16,7 +16,7 @@ use function round;
 
 class Base
 {
-    const VERSION = '0.3.1';
+    const VERSION = '0.3.2';
 
     public $verbose;
 

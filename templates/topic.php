@@ -1,6 +1,6 @@
 <?php
 /**
- * Just Refs
+ * Just Refs - https://github.com/attogram/justrefs
  * Topic page template
  */
 
@@ -77,13 +77,13 @@ function printItems($name, $displayName, $webObject, $externalLink = false) {
 </div>
 <hr />
 <div class="flex-container">
-  <div class="lcol"><?php printItems('technical_template', 'Support Templates', $this); ?></div>
-  <div class="rcol"><?php printItems('module', 'Modules', $this); ?></div>
+  <div class="lcol"><?php printItems('draft', 'Drafts', $this); ?></div>
+  <div class="rcol"><?php printItems('user', 'Users', $this); ?></div>
 </div>
 <hr />
 <div class="flex-container">
-  <div class="lcol"><?php printItems('draft', 'Drafts', $this); ?></div>
-  <div class="rcol"><?php printItems('user', 'Users', $this); ?></div>
+  <div class="lcol"><?php printItems('technical_template', 'Support Templates', $this); ?></div>
+  <div class="rcol"><?php printItems('module', 'Modules', $this); ?></div>
 </div>
 <hr />
 <div class="flex-container">
