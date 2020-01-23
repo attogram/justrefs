@@ -1,6 +1,6 @@
 {
     "name": "attogram/justrefs",
-    "description": "Just Refs - The Naked Wikipedia",
+    "description": "Just Refs - extract lists of references and related topics from any page on the English Wikipedia.",
     "type": "project",
     "license": "MIT",
     "require": {
