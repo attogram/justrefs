@@ -35,6 +35,7 @@ class Web extends Base
     private $data = []; // topic data
     private $filesystem; // Attogram\Justrefs\Filesystem
     private $mediaWiki; // Attogram\Justrefs\MediaWiki
+    private $template; // Attogram\Justrefs\Template
     private $query = ''; // current query
     private $router; // Attogram\Router\Router
     private $title = ''; // current page title
@@ -45,19 +46,17 @@ class Web extends Base
     public function route()
     {
         $this->startTimer('page');
-        $this->router = new \Attogram\Router\Router();
-        $this->router->allow('/', 'home');
-        $this->router->allow('/r/?', 'topic');
-        $this->router->allow('/r/?/?', 'topic');
-        $this->router->allow('/r/?/?/?', 'topic');
-        $this->router->allow('/r/?/?/?/?', 'topic');
-        $this->router->allow('/about', 'about');
-        $this->router->allow('/refresh', 'refresh');
-        $this->router->allow('/refresh/?', 'refresh');
-        $this->router->allow('/refresh/?/?', 'refresh');
-        $this->router->allow('/refresh/?/?/?', 'refresh');
-        $this->router->allow('/refresh/?/?/?/?', 'refresh');
-        switch ($this->router->match()) {
+
+        $this->initRouter();
+        $match = $this->router->match();
+        if (!$match) {
+            $this->error404('Page Not Found'); // exits
+        }
+
+        $this->template = new Template();
+        $this->vars['home'] = $this->router->getHome();
+        
+        switch ($match) {
             case 'topic':
                 $this->topic();
                 break;
@@ -75,26 +74,40 @@ class Web extends Base
             case 'refresh':
                 $this->refresh();
                 break;
-            default:
-                $this->error404('Page Not Found');
-                break;
         }
+    }
+
+    private function initRouter()
+    {
+        $this->router = new \Attogram\Router\Router();
+        $this->router->allow('/', 'home');
+        $this->router->allow('/r/?', 'topic');
+        $this->router->allow('/r/?/?', 'topic');
+        $this->router->allow('/r/?/?/?', 'topic');
+        $this->router->allow('/r/?/?/?/?', 'topic');
+        $this->router->allow('/about', 'about');
+        $this->router->allow('/refresh', 'refresh');
+        $this->router->allow('/refresh/?', 'refresh');
+        $this->router->allow('/refresh/?/?', 'refresh');
+        $this->router->allow('/refresh/?/?/?', 'refresh');
+        $this->router->allow('/refresh/?/?/?/?', 'refresh');
     }
 
     private function homepage()
     {
-        $this->title = $this->siteName;
-        $this->includeTemplate('header');
-        $this->includeTemplate('home');
-        $this->includeTemplate('footer');
+        $this->vars['title'] = $this->siteName;
+        $this->template->setvars($this->vars);
+        $this->template->include('header');
+        $this->template->include('home');
+        $this->template->include('footer');
     }
 
     private function about()
     {
-        $this->title = 'About this site';
-        $this->includeTemplate('header');
-        $this->includeTemplate('about');
-        $this->includeTemplate('footer');
+        $this->vars['title'] = 'About this site';
+        $this->template->include('header');
+        $this->template->include('about');
+        $this->template->include('footer');
     }
 
     private function search()
@@ -118,22 +131,22 @@ class Web extends Base
         // no search results
         header('HTTP/1.0 404 Not Found');
         $this->title = $this->siteName;
-        $this->includeTemplate('header');
-        $this->includeTemplate('home');
+        $this->template->include('header');
+        $this->template->include('home');
         print '<b>0</b> results';
-        $this->includeTemplate('footer');
+        $this->template->include('footer');
     }
 
     private function searchResults()
     {
         $this->title = 'search results - ' . $this->siteName;
-        $this->includeTemplate('header');
+        $this->template->include('header');
         print '<b>' . count($this->data) . '</b> results<ol>';
         foreach ($this->data as $topic) {
             print '<li><a href="' . $this->getLink($topic) . '">' . $topic . '</a></li>';
         }
         print '</ol>';
-        $this->includeTemplate('footer');
+        $this->template->include('footer');
     }
 
     private function topic()
@@ -273,9 +286,9 @@ class Web extends Base
 
         // Display page
         $this->title = $this->data['title'] . ' - ' . $this->siteName;
-        $this->includeTemplate('header');
-        $this->includeTemplate('topic');
-        $this->includeTemplate('footer');
+        $this->template->include('header');
+        $this->template->include('topic');
+        $this->template->include('footer');
     }
 
     private function setVarsTopics()
@@ -502,15 +515,15 @@ class Web extends Base
             if (!$this->filesystem->delete($this->query)) {
                 $this->error404('Deletion Failed');
             }
-            $this->includeTemplate('header');
+            $this->template->include('header');
             print '<p>OK - cache deleted</p>'
                 . '<p><a href="' . $this->getLink($this->query) . '">' . $this->query . '</a></p>';
-            $this->includeTemplate('footer');
+            $this->template->include('footer');
             return;
         }
 
         $this->title = 'Refresh';
-        $this->includeTemplate('header');
+        $this->template->include('header');
         print '<p><b><a href="' . $this->getLink($this->query) . '">' . $this->query 
             . '</a></b> is currently cached.</p>';
         $letterOne = chr(rand(65,90));
@@ -528,7 +541,7 @@ class Web extends Base
             . '<br /><br />'
             . '<input type="submit" value="    Delete Cache    ">'
             . '</form>';
-        $this->includeTemplate('footer');
+        $this->template->include('footer');
     }
 
     /**
@@ -566,28 +579,15 @@ class Web extends Base
     private function error404($message = 'Page Not Found', $refresh = '')
     {
         header('HTTP/1.0 404 Not Found');
-        $this->includeTemplate('header');
+        $this->template->include('header');
         print '<h1>Error 404</h1><h2>' . $message . '</h2>';
         if ($refresh) {
             print '<p><small><a href="' 
             . $this->router->getHome() . 'refresh/' . $this->encodeLink($refresh)
             . '">Attempt Refresh</a></small></p>';
         }
-        $this->includeTemplate('footer');
+        $this->template->include('footer');
         exit;
-    }
-
-    /**
-     * @param string $name
-     */
-    public function includeTemplate($name)
-    {
-        $template = '../templates/' . $name . '.php';
-        if (is_readable($template)) {
-            include($template);
-            return;
-        }
-        //$this->verbose('includeTemplate: ERROR NOT FOUND: ' . $template);
     }
 
     protected function initFilesystem()
