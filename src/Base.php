@@ -8,7 +8,6 @@ declare(strict_types = 1);
 
 namespace Attogram\Justrefs;
 
-use function error_get_last;
 use function get_class;
 use function gmdate;
 use function htmlentities;
