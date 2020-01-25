@@ -8,6 +8,10 @@ declare(strict_types = 1);
 
 namespace Attogram\Justrefs;
 
+use function is_string;
+use function strlen;
+use function trim;
+
 class JustRefs extends Base
 {
     private $query = ''; // current query
@@ -17,9 +21,6 @@ class JustRefs extends Base
      */
     public function route()
     {
-        //register_shutdown_function(array($this, 'shutdownHandler'));
-        //ini_set('display_errors', '1');
-
         $this->startTimer('page');
 
         $this->initRouter();

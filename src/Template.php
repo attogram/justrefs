@@ -55,7 +55,6 @@ class Template extends Base
             return false;
         }
         $this->vars[$name] = $value;
-        $this->verbose("set: $name = " . print_r($value, true));
 
         return true;
     }

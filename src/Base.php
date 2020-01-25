@@ -143,17 +143,6 @@ class Base
         return round(microtime(true) - $this->timer[$name], 4);
     }
 
-    public function shutdownHandler()
-    {
-        $error = error_get_last();
-        if (!$error) {
-            exit;
-        }
-        $this->verbose = true;
-        $this->verbose('FATAL ERROR: ' . print_r($error, true));
-        exit;
-    }
-
     /**
      * @param string $message
      * @param string $reresh - refresh query link
