@@ -110,8 +110,8 @@ class Topic extends Base
      */
     private function setDataFromApi()
     {
-        $this->initMediaWiki();
-        $this->data = $this->mediaWiki->links($this->topic);
+        $this->initMediawiki();
+        $this->data = $this->mediawiki->links($this->topic);
         if (!is_array($this->data)) {
             $this->data = [];
         }
@@ -157,9 +157,9 @@ class Topic extends Base
                     break; // exclude
                 case '7':  // File_talk
                     break; // exclude
-                case '8':  // MediaWiki
+                case '8':  // Mediawiki
                     break; // exclude
-                case '9':  // MediaWiki_talk
+                case '9':  // Mediawiki_talk
                     break; // exclude
                 case '10': // Template
                     $this->vars['template'][] = $topic['*'];

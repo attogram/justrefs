@@ -31,8 +31,8 @@ class Search extends Base
         $this->searchResults = $this->filesystem->get($cachedFile);
         if (!is_array($this->searchResults) || empty($this->searchResults)) {
             // No cached results - Get results from API
-            $this->initMediaWiki();
-            $this->searchResults = $this->mediaWiki->search($query);
+            $this->initMediawiki();
+            $this->searchResults = $this->mediawiki->search($query);
             if ($this->searchResults) { 
                 // Got API results - Save results to cache
                 $this->filesystem->set($cachedFile, json_encode($this->searchResults));

@@ -17,7 +17,7 @@ use function round;
 
 class Base
 {
-    const VERSION = '0.4.0';
+    const VERSION = '0.4.1';
 
     public $verbose; // @param bool $verbose - print verbose debug messages to STDOUT
     public $router; // Attogram\Router\Router
@@ -29,7 +29,7 @@ class Base
         '..' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR;
     protected $timer = []; // @param array $timer - array of start times
     protected $filesystem; // Attogram\Justrefs\Filesystem
-    protected $mediaWiki;  // Attogram\Justrefs\MediaWiki
+    protected $mediawiki;  // Attogram\Justrefs\Mediawiki
 
     /**
      * @param string $message (optional)
@@ -115,10 +115,10 @@ class Base
         $this->filesystem->verbose = $this->verbose;
     }
 
-    protected function initMediaWiki()
+    protected function initMediawiki()
     {
-        $this->mediaWiki = new MediaWiki();
-        $this->mediaWiki->verbose = $this->verbose;
+        $this->mediawiki = new Mediawiki();
+        $this->mediawiki->verbose = $this->verbose;
     }
 
     /**
