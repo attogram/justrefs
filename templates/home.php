@@ -4,7 +4,10 @@
  *
  * Home Page template
  */
-?>
+
+$this->include('html_head'); 
+
+?><div class="body">
 <h1>Just Refs</h1>
 <ul>
 <li>View just the <b>references</b> and <b>related topics</b> 
@@ -37,3 +40,7 @@
 <li><a href="r/Sport">Sport</a></li>
 <li><a href="r/Technology">Technology</a></li>
 </ul>
+<br />
+</div><?php
+
+$this->include('footer');

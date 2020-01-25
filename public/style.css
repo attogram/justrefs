@@ -17,14 +17,11 @@ ol {
   list-style-type:decimal-leading-zero;
   padding:7px 0 0 0;
 }
-ul li {
-  list-style-type:inherit;
+li {
+  font-size:110%;
 }
 pre {
   margin:0;
-}
-div {
-  background-color:white;
 }
 a:link {
   color:darkblue;
@@ -47,7 +44,8 @@ a.missing {
 }
 .head {
   background-color:lightgrey;
-  padding:10px 10px 10px 10px;
+  font-size:115%;
+  padding:8px 8px 8px 8px;
 }
 .body {
   background-color:white;
