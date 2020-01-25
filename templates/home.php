@@ -40,6 +40,7 @@ $this->include('html_head');
 <li><a href="r/Sport">Sport</a></li>
 <li><a href="r/Technology">Technology</a></li>
 </ul>
+<br />
 </div><?php
 
 $this->include('footer');
