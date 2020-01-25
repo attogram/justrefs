@@ -17,7 +17,6 @@ use function substr;
 
 class Topic extends Base
 {
-    private $topic; // page topic
     private $data = []; // topic data
     private $vars = []; // template vars
 
@@ -118,36 +117,6 @@ class Topic extends Base
         }
     }
 
-    /**
-     * set $this->topic to string from URL elements, or empty string
-     */
-    private function setTopicFromUrl()
-    {
-        $this->topic = $this->router->getVar(0);
-        if ($this->router->getVar(1)) {
-            $this->topic .= '/' . $this->router->getVar(1);
-            if ($this->router->getVar(2)) {
-                $this->topic .= '/' . $this->router->getVar(2);
-                if ($this->router->getVar(3)) {
-                    $this->topic .= '/' . $this->router->getVar(3);
-                    if ($this->router->getVar(4)) {
-                        $this->topic .= '/' . $this->router->getVar(4);
-                    }
-                }
-            }
-        }
-        if (!is_string($this->topic) || !strlen($this->topic)) {
-            $this->topic = '';
-            return;
-        }
-        // format query
-        $this->topic = trim($this->topic);
-        $this->topic = str_replace('_', ' ', $this->topic);
-        $this->topic = urldecode($this->topic);
-        if (!is_string($this->topic) || !strlen($this->topic)) {
-            $this->topic = '';
-        }
-    }
 
     private function setVarsTopics()
     {

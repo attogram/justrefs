@@ -7,7 +7,14 @@
  */
 ?><footer>
   <b><a href="<?= $this->get('home') ?>"><?= $this->get('name') ?></a></b>
-  <small>v<?= $this->get('version') ?></small>
-  - <small>page generated in <?= $this->endTimer('page') ?> seconds</small>
+  - <a href="<?= $this->get('home') ?>about/">About</a>
+  <br /><br />
+  <ul>
+  <li>Powered by <b><a href="https://github.com/attogram/justrefs">attogram/justrefs</a></b>
+    v<?= $this->get('version') ?>
+  <li><a href="https://github.com/sponsors/attogram"><b>Sponsor</b> the Just Refs open source project</a></li>
+  <br />
+  <li>Page generated in <?= $this->endTimer('page') ?> seconds</ul>
+  </ul>
 </footer>
 </body></html>

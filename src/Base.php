@@ -24,6 +24,7 @@ class Base
     public $router; // Attogram\Router\Router
     public $template;   // Attogram\Justrefs\Template
 
+    protected $topic;
     protected $siteName = 'Just Refs'; // @param string $siteName - The Name of the site!
     protected $basePath = // @param string $basePath - path to cache directory
         '..' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR;
@@ -67,7 +68,7 @@ class Base
             '+' => '%2B',
             '=' => '%3D',
             '?' => '%3F',
-            "\\" => '%5C',
+            '\\' => '%5C',
             '^' => '%5E',
             '`' => '%60',
             '~' => '%7E',
@@ -76,6 +77,37 @@ class Base
             $query = str_replace($old, $new, $query);
         }
         return $query;
+    }
+
+    /**
+     * set $this->topic to string from URL elements, or empty string
+     */
+    protected function setTopicFromUrl()
+    {
+        $this->topic = $this->router->getVar(0);
+        if ($this->router->getVar(1)) {
+            $this->topic .= '/' . $this->router->getVar(1);
+            if ($this->router->getVar(2)) {
+                $this->topic .= '/' . $this->router->getVar(2);
+                if ($this->router->getVar(3)) {
+                    $this->topic .= '/' . $this->router->getVar(3);
+                    if ($this->router->getVar(4)) {
+                        $this->topic .= '/' . $this->router->getVar(4);
+                    }
+                }
+            }
+        }
+        if (!is_string($this->topic) || !strlen($this->topic)) {
+            $this->topic = '';
+            return;
+        }
+        // format query
+        $this->topic = trim($this->topic);
+        $this->topic = str_replace('_', ' ', $this->topic);
+        $this->topic = urldecode($this->topic);
+        if (!is_string($this->topic) || !strlen($this->topic)) {
+            $this->topic = '';
+        }
     }
 
     protected function initFilesystem()
@@ -119,6 +151,28 @@ class Base
         }
         $this->verbose = true;
         $this->verbose('FATAL ERROR: ' . print_r($error, true));
+        exit;
+    }
+
+    /**
+     * @param string $message
+     * @param string $reresh - refresh query link
+     * @return void
+     */
+    public function error404($message = 'Page Not Found', $refresh = '')
+    {
+        header('HTTP/1.0 404 Not Found');
+        $this->template->include('html_head');
+        $this->template->include('header');
+        print '<div class="body"><h1>Error 404</h1><h2>' . $message . '</h2>';
+        if ($refresh) {
+            print '<p><small><a href="'
+                . $this->template->get('home') . 'refresh/'
+                . $this->encodeLink($refresh)
+                . '">Attempt Refresh</a></small></p>';
+        }
+        print '</div>';
+        $this->template->include('footer');
         exit;
     }
 }
