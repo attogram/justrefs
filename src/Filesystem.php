@@ -1,6 +1,7 @@
 <?php
 /**
  * Just Refs - https://github.com/attogram/justrefs
+ *
  * Filesystem Class
  */
 declare(strict_types = 1);
@@ -75,11 +76,7 @@ class Filesystem extends Base
             return false;
         }
         $this->verbose("get: $name - $path - " . count($data));
-        $this->verbose('get: title: ' . @$data['title']);
-        $this->verbose('get: error: ' . @$data['error']);
-        $this->verbose('get: # refs: ' . @count($data['refs']));
-        $this->verbose('get: # topics: ' . @count($data['topics']));
-        $this->verbose('get: # templates: ' . @count($data['templates']));
+
         return $data;
     }
 

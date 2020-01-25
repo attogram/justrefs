@@ -4,25 +4,22 @@
  * Topic page template
  */
 
-function printItems($name, $displayName, $webObject, $externalLink = false) {
-    if (!isset($webObject->vars[$name]) || !is_array($webObject->vars[$name])) {
+function printItems($name, $displayName, $templateObject, $externalLink = false) {
+    if (!is_array($templateObject->get($name))) {
         print '<a name="' . $name . '"><b>0</b> ' . $displayName . ':</a><br />';
         return;
     }
-    print '<a name="' . $name . '"><b>' . count($webObject->vars[$name]) . '</b> ' . $displayName . ':</a>';
+    print '<a name="' . $name . '"><b>' . count($templateObject->get($name)) . '</b> ' . $displayName . ':</a>';
     print '<ol>';
-    foreach ($webObject->vars[$name] as $item) {
-
-        if (in_array($item, $webObject->vars['missing'])) {
+    foreach ($templateObject->get($name) as $item) {
+        if (in_array($item, $templateObject->get('missing'))) {
           // Link to non-existing internal page (red link)
           print '<li><span class="red">' . $item . '</span></li>';
           continue;
         }
-
         if ($externalLink) {
           // Link to external reference
-          print '<li><a href="' . $item . '" target="_blank">' 
-              . $item . '</li>';
+          print '<li><a href="' . $item . '" target="_blank">' . $item . '</li>';
           continue;
         } 
 
@@ -30,34 +27,40 @@ function printItems($name, $displayName, $webObject, $externalLink = false) {
         $class = '';
         //if ($name == 'template' || $name == 'technical_template') {
         if ($name == 'template') {
-            if (!in_array($item, $webObject->vars['exists'])) {
+            if (!in_array($item, $templateObject->get('exists'))) {
                 $class = ' class="missing"';
             }
         }
-        print '<li><a href="' . $webObject->getLink($item) . '"' 
-          . $class . '>' . $item . '</a></li>';
+        print '<li><a href="'
+            . $templateObject->get('home')
+            . $templateObject->getLink($item) . '"' 
+            . $class . '>' . $item . '</a></li>';
     }
     print '</ol>';
 }
-?>
-<h1><?= $this->vars['h1'] ?></h1>
+
+$this->include('html_head'); 
+$this->include('header');
+
+?><div class="body">
+<h1><?= $this->get('h1') ?></h1>
 <hr />
 <ul>
-  <li><a href="#refs"><b><?= count($this->vars['refs']) ?></b> References</a>,
-      <a href="#main"><b><?= count($this->vars['main']) ?></b> Topics</a></li>
-  <li><a href="#template"><b><?= count($this->vars['template']) ?></b> Templates</a>,
-      <a href="#portal"><b><?= count($this->vars['portal']) ?></b> Portals</a>,
-      <a href="#wikipedia"><b><?= count($this->vars['wikipedia']) ?></b> Wikipedia</a>,
-      <a href="#help"><b><?= count($this->vars['help']) ?></b> Help</a>,
-      <a href="#technical_template"><b><?= count($this->vars['technical_template']) ?></b> Support Templates</a>,
-      <a href="#module"><b><?= count($this->vars['module']) ?></b> Modules</a>,
-      <a href="#draft"><b><?= count($this->vars['draft']) ?></b> Drafts</a>,
-      <a href="#user"><b><?= count($this->vars['user']) ?></b> Users</a>
+  <li><a href="#refs"><b><?= count($this->get('refs')) ?></b> References</a>,
+      <a href="#main"><b><?= count($this->get('main')) ?></b> Topics</a></li>
+  <li><a href="#template"><b><?= count($this->get('template')) ?></b> Templates</a>,
+      <a href="#portal"><b><?= count($this->get('portal')) ?></b> Portals</a>,
+      <a href="#wikipedia"><b><?= count($this->get('wikipedia')) ?></b> Wikipedia</a>,
+      <a href="#help"><b><?= count($this->get('help')) ?></b> Help</a>,
+      <a href="#technical_template"><b><?= count($this->get('technical_template')) ?></b> Support Templates</a>,
+      <a href="#module"><b><?= count($this->get('module')) ?></b> Modules</a>,
+      <a href="#draft"><b><?= count($this->get('draft')) ?></b> Drafts</a>,
+      <a href="#user"><b><?= count($this->get('user')) ?></b> Users</a>
     </li>
-  <li>Cached <?= $this->vars['dataAge'] ?> UTC (<a href="<?= $this->vars['refresh'] ?>">refresh</a>)</li>
-  <li>Served <?= $this->vars['now'] ?> UTC</li>
-  <li>Extracted from &lt;<a href="<?= $this->vars['source'] ?>" target="_blank"><?= 
-    $this->vars['source'] ?></a>&gt; released under the 
+  <li>Cached <?= $this->get('dataAge') ?> UTC (<a href="<?= $this->get('refresh') ?>">refresh</a>)</li>
+  <li>Served <?= $this->get('now') ?> UTC</li>
+  <li>Extracted from &lt;<a href="<?= $this->get('source') ?>" target="_blank"><?= 
+    $this->get('source') ?></a>&gt; released under the 
     Creative Commons Attribution-Share-Alike License 3.0</li>
 </ul>
 <hr />
@@ -101,3 +104,6 @@ function printItems($name, $displayName, $webObject, $externalLink = false) {
   </div>
 </div>
 <hr />
+</div><?php
+
+$this->include('footer');

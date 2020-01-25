@@ -1,6 +1,7 @@
 <?php
 /**
  * Just Refs - https://github.com/attogram/justrefs
+ *
  * Mediawiki Class
  */
 declare(strict_types = 1);
