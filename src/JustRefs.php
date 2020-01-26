@@ -34,8 +34,9 @@ class JustRefs extends Base
         switch ($match) {
             case 'topic':
                 $topic = new Topic();
+                $topic->verbose = $this->verbose;
                 $topic->template = $this->template;
-                $topic->router = $this->router;
+                $topic->router = $this->router; // topic :: setTopicFromUrl() needs router
                 $topic->get();
                 break;
             case 'home':

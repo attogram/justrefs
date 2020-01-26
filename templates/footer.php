@@ -13,7 +13,6 @@
   <li>Powered by <b><a href="https://github.com/attogram/justrefs">attogram/justrefs</a></b>
     v<?= $this->get('version') ?>
   <li><a href="https://github.com/sponsors/attogram"><b>Sponsor</b> the Just Refs open source project</a></li>
-  <br />
   <li>Page generated in <?= $this->endTimer('page') ?> seconds</ul>
   </ul>
 </footer>

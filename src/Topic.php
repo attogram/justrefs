@@ -57,42 +57,6 @@ class Topic extends Base
         $this->error404('Topic Not Found');
     }
 
-    private function display()
-    {
-        // set template variables
-        $this->setVarsTopics();
-        $this->setVarsRefs();
-        $this->setVarsTemplates();
-        $this->setVarsExists();
-        $this->removeTemplateTopics();
-        
-        foreach (array_keys($this->vars) as $index) {
-            // sort var lists alphabetically
-            sort($this->vars[$index]);
-            // set template vars
-            $this->template->set($index, $this->vars[$index]);
-        }
-
-        // set Extraction source url
-        $this->template->set('source', 'https://en.wikipedia.org/wiki/' . $this->encodeLink($this->data['title']));
-
-        // set Data and Cache age
-        $this->dataAge = '?';
-        $age = $this->filesystem->age($this->data['title']);
-        if ($age) {
-            $this->dataAge = gmdate('Y-m-d H:i:s', $age);
-        }
-        $this->template->set('dataAge', $this->dataAge);
-        $this->template->set('now', gmdate('Y-m-d H:i:s'));
-
-        $this->template->set('refresh', $this->router->getHome() . 'refresh/' . $this->encodeLink($this->data['title']));
-        $this->template->set('h1', $this->data['title']);
-
-        $this->template->set('title', $this->data['title'] . ' - ' . $this->siteName);
-
-        $this->template->include('topic');
-    }
-
     /**
      * set $this->data to array from cached file, or empty array
      */
@@ -117,18 +81,79 @@ class Topic extends Base
         }
     }
 
-
-    private function setVarsTopics()
+    private function display()
     {
-        $varIndexi = [
-            'missing', 'main', 'template', 'portal', 'wikipedia', 'help', 'module', 'draft',
-            'user', 'talk', 'user_talk', 'wikipedia_talk', 'help_talk', 
-        ];
-        foreach ($varIndexi as $index) {
-            $this->vars[$index] = [];
+        $this->setTemplateVars();
+        // set Extraction source url
+        $this->template->set('source', $this->source . $this->encodeLink($this->data['title']));
+        // set Data and Cache age
+        $this->dataAge = '?';
+        $age = $this->filesystem->age($this->data['title']);
+        if ($age) {
+            $this->dataAge = gmdate('Y-m-d H:i:s', $age);
+        }
+        $this->template->set('dataAge', $this->dataAge);
+        $this->template->set('now', gmdate('Y-m-d H:i:s'));
+        $this->template->set('refresh', $this->template->get('home') . 'refresh/' . $this->encodeLink($this->data['title']));
+        $this->template->set('h1', $this->data['title']);
+        $this->template->set('title', $this->data['title'] . ' - ' . $this->siteName);
+        $this->template->include('topic');
+    }
+
+    private function setTemplateVars()
+    {
+        $this->initVars();
+        $this->setNamespaces();
+        $this->setVarsRefs();
+        $this->setVarsTemplates();
+        $this->setVarsTemplateExists();
+        $this->removeTemplateTopics();
+
+
+        foreach (array_keys($this->vars) as $index) {
+            $this->verbose('setTemplateVars: vars.' . $index . ' ' . count($this->vars[$index]));
+            // set counts
+            $this->template->set('count_' . $index, count($this->vars[$index]));
+            // sort var lists alphabetically
+            sort($this->vars[$index]);
+            // convert to html links
+            //$this->vars[$index] = $this->linkify($index, $this->vars[$index]);
+            // set template vars
+            $this->template->set($index, $this->vars[$index]);
         }
 
+        $this->verbose('setTemplateVars: vars: # ' . count($this->vars));
+    }
+
+    private function initVars()
+    {
+        $ns = [
+            'main', 'talk',
+            'template', 'template_talk',
+            'portal', 'portal_talk',
+            'wikipedia', 'wikipedia_talk',
+            'help', 'help_talk',
+            'module', 'module_talk',
+            'draft', 'draft_talk',
+            'user', 'user_talk',
+            'refs',
+            'missing',
+            'exists',
+            'main_secondary',
+            'template_secondary',
+        ];
+        foreach ($ns as $index) {
+            $this->vars[$index] = [];
+        }
+        $this->verbose('initVars: vars: # ' . count($this->vars));
+        //$this->verbose('initVars: vars: ' . print_r($this->vars, true));
+    }
+
+    private function setNamespaces()
+    {
+        $this->verbose('setNamespaces: data.topics: # ' . count($this->data['topics']));
         foreach ($this->data['topics'] as $topic) {
+            //$this->verbose('setNamespaces: topic: ' . print_r($topic, true));
             if (!isset($topic['exists'])) {
                 // page does not exist
                 $this->vars['missing'][] = $topic['*'];
@@ -207,23 +232,41 @@ class Topic extends Base
                     break; // exclucde
             }                
         }
+        $this->verbose('setNamespaces: vars: # ' . count($this->vars));
+        $this->verbose('setNamespaces: vars.main: # ' . count($this->vars['main']));
+        $this->verbose('setNamespaces: vars.template: # ' . count($this->vars['template']));
+        $this->verbose('setNamespaces: vars.portal: # ' . count($this->vars['portal']));
+        $this->verbose('setNamespaces: vars.module: # ' . count($this->vars['module']));
+
+    }
+
+    private function setVarsTemplateExists()
+    {
+        $this->verbose('setVarsTemplateExists: vars.template: # ' . count($this->vars['template']));
+        foreach ($this->vars['template'] as $item) {
+            $this->verbose('setVarsTemplateExists: check: ' . $item);
+            if ($this->filesystem->exists($item)) {
+                $this->vars['exists'][] = $item;
+            }
+        }
+        $this->verbose('setVarsTemplateExists: vars.exists: ' . print_r($this->vars['exists'], true));
     }
 
     private function setVarsRefs()
     {
-        $this->vars['refs'] = [];
+        $this->verbose('setVarsRefs: data.refs: # ' . count($this->data['refs']));
         foreach ($this->data['refs'] as $ref) {
             if (substr($ref, 0, 2) == '//') {
                 $ref = 'https:' . $ref;
             }
             $this->vars['refs'][] = $ref;
         }
+        $this->verbose('setVarsRefs: vars.refs: # ' . count($this->vars['refs']));
     }
 
     private function setVarsTemplates()
     {
-        $this->vars['technical_template'] = [];
-
+        $this->verbose('setVarsTemplates: data.templates: # ' . count($this->data['templates']));
         foreach ($this->data['templates'] as $item) {
             switch ($item['ns']) {
                 case '0': // Main
@@ -233,36 +276,31 @@ class Topic extends Base
                     break;
                 case '10': // Template:
                     if (!in_array($item['*'], $this->vars['template'])) {
-                        $this->vars['technical_template'][] = $item['*'];
+                        $this->vars['template_secondary'][] = $item['*'];
                     }
                     break;
                 case '828': // Module:
                     $this->vars['module'][] = $item['*'];
                     break;
-                default:
-                    break;
             }
         }
-    }
-
-    private function setVarsExists()
-    {
-        $this->vars['exists'] = [];
-        foreach ($this->vars['template'] as $item) {
-            if ($this->filesystem->exists($item)) {
-                $this->vars['exists'][] = $item;
-            }
-        }
+        $this->verbose('setVarsTemplates: vars.main: # ' . count($this->vars['main']));
+        $this->verbose('setVarsTemplates: vars.template_secondary: # ' . count($this->vars['template_secondary']));
+        $this->verbose('setVarsTemplates: vars.module: # ' . count($this->vars['module']));
     }
 
     private function removeTemplateTopics() {
+        $this->verbose('removeTemplateTopics: vars.main: # ' . count($this->vars['main']));
+        $this->verbose('removeTemplateTopics: vars.template: # ' . count($this->vars['template']));
+        $this->verbose('removeTemplateTopics: vars.template_secondary: # ' . count($this->vars['template_secondary']));
         if (empty($this->vars['main'])) {
             return;
         }
-        if (empty($this->vars['template']) && $this->vars['technical_template']) {
+        if (empty($this->vars['template']) && $this->vars['template_secondary']) {
             return;
         }
         foreach ($this->vars['template'] as $template) {
+            $this->verbose('removeTemplateTopics: template: ' . $template);
             if ($template == $this->topic) {
                 continue; // self
             }
@@ -270,6 +308,7 @@ class Topic extends Base
                 continue; // template not cached
             }
             $templateData = $this->filesystem->get($template);
+            $this->verbose('removeTemplateTopics: templateData: # ' . count($templateData));
             if (empty($templateData['topics']) || !is_array($templateData['topics'])) {
                 continue; // error malformed data
             }
@@ -278,9 +317,64 @@ class Topic extends Base
                     // remove this template topic from master topic list
                     if (in_array($exTopic['*'], $this->vars['main'])) {
                         unset($this->vars['main'][array_search($exTopic['*'], $this->vars['main'])]);
+                        $this->vars['main_secondary'][] = $exTopic['*'];
+                        $this->verbose('removeTemplateTopics: main_secondary: ' . $exTopic['*']);
                     }
                 }
             }
         }
+        $this->verbose('removeTemplateTopics: vars.main: # ' . count($this->vars['main']));
+        $this->verbose('removeTemplateTopics: vars.main_secondary: # ' . count($this->vars['main_secondary']));
+    }
+
+    /**
+     * @param string $index - vars index
+     * @param array $list - array of items
+     */
+    private function linkify($index, $list)
+    {
+        $this->verbose("linkify: index: $index count.list: " . count($list));
+        return $list;
+        switch ($index) {
+            case 'exists':
+            case 'missing':
+                return;
+        }
+    
+        $html = '<ol>';
+
+        //print '<pre>linkify: LIST: ' . print_r($list, true) . '</pre>';
+        foreach ($list as $item) {
+            print '<pre>linkify: ITEM: ' . print_r($item, true) . '</pre>';
+            
+            // Link to external reference
+            if ($index == 'main') {
+              $html .= '<li><a href="' . $item . '" target="_blank">' . $item . '</li>';
+              continue;
+            }
+
+            // non-existing page
+            
+            if (in_array($item, $this->vars['missing'])) { 
+                $html .= '<li><span class="red">' . $item . '</span></li>';
+                continue;
+            }
+
+            // Link to internal page
+            $class = '';
+            if ($index == 'template') {
+                if (!in_array($item, $this->vars['exists'])) {
+                    $class = ' class="missing"';
+                }
+            }
+            $html .= '<li><a href="' . $this->template->get('home') . $this->getLink($item) . '"' 
+                . $class . '>' . $item . '</a></li>';
+
+        }
+
+        $html .= '</ol>';
+
+
+        return $list;
     }
 }

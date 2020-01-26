@@ -17,9 +17,6 @@ ol {
   list-style-type:decimal-leading-zero;
   padding:7px 0 0 0;
 }
-li {
-  font-size:110%;
-}
 pre {
   margin:0;
 }
