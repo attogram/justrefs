@@ -8,7 +8,6 @@ declare(strict_types = 1);
 
 namespace Attogram\Justrefs;
 
-use function is_array;
 use function is_readable;
 use function is_string;
 
@@ -37,7 +36,7 @@ class Template extends Base
         }
         try {
             include($template);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             return false;
         }
 
@@ -47,7 +46,7 @@ class Template extends Base
     /**
      * set a single var
      * @param string $name
-     * @param string|mixed $value
+     * @param mixed $value
      */
     public function set(string $name, $value): bool
     {
@@ -55,6 +54,7 @@ class Template extends Base
             return false;
         }
         $this->vars[$name] = $value;
+        $this->verbose("set: $name: " . print_r($value, true));
 
         return true;
     }

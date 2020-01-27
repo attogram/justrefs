@@ -3,7 +3,7 @@
  * Just Refs - https://github.com/attogram/justrefs
  * Public Index Page
  */
-$verbose = false;
+$verbose = true;
 
 $vendor = '../vendor/autoload.php';
 if (!is_readable($vendor)) {

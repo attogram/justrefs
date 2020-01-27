@@ -109,20 +109,21 @@ class Topic extends Base
         $this->setVarsTemplateExists();
         $this->removeTemplateTopics();
 
-
         foreach (array_keys($this->vars) as $index) {
             $this->verbose('setTemplateVars: vars.' . $index . ' ' . count($this->vars[$index]));
             // set counts
             $this->template->set('count_' . $index, count($this->vars[$index]));
             // sort var lists alphabetically
             sort($this->vars[$index]);
-            // convert to html links
-            //$this->vars[$index] = $this->linkify($index, $this->vars[$index]);
+            // set html list
+            $this->template->set($index . '_list', $this->listify($index, $this->vars[$index]));
             // set template vars
             $this->template->set($index, $this->vars[$index]);
         }
 
         $this->verbose('setTemplateVars: vars: # ' . count($this->vars));
+
+
     }
 
     private function initVars()
@@ -318,7 +319,7 @@ class Topic extends Base
                     if (in_array($exTopic['*'], $this->vars['main'])) {
                         unset($this->vars['main'][array_search($exTopic['*'], $this->vars['main'])]);
                         $this->vars['main_secondary'][] = $exTopic['*'];
-                        $this->verbose('removeTemplateTopics: main_secondary: ' . $exTopic['*']);
+                        //$this->verbose('removeTemplateTopics: main_secondary: ' . $exTopic['*']);
                     }
                 }
             }
@@ -330,11 +331,12 @@ class Topic extends Base
     /**
      * @param string $index - vars index
      * @param array $list - array of items
+     * @return string - html fragment
      */
-    private function linkify($index, $list)
+    private function listify($index, $list)
     {
-        $this->verbose("linkify: index: $index count.list: " . count($list));
-        return $list;
+        $this->verbose("listify: index: $index count.list: " . count($list));
+
         switch ($index) {
             case 'exists':
             case 'missing':
@@ -342,11 +344,8 @@ class Topic extends Base
         }
     
         $html = '<ol>';
-
-        //print '<pre>linkify: LIST: ' . print_r($list, true) . '</pre>';
         foreach ($list as $item) {
-            print '<pre>linkify: ITEM: ' . print_r($item, true) . '</pre>';
-            
+            //$this->verbose('listify: ' . $item);            
             // Link to external reference
             if ($index == 'main') {
               $html .= '<li><a href="' . $item . '" target="_blank">' . $item . '</li>';
@@ -354,7 +353,6 @@ class Topic extends Base
             }
 
             // non-existing page
-            
             if (in_array($item, $this->vars['missing'])) { 
                 $html .= '<li><span class="red">' . $item . '</span></li>';
                 continue;
@@ -367,14 +365,14 @@ class Topic extends Base
                     $class = ' class="missing"';
                 }
             }
-            $html .= '<li><a href="' . $this->template->get('home') . $this->getLink($item) . '"' 
+            $html .= '<li><a href="' 
+                . $this->template->get('home')
+                . $this->getLink($item) . '"' 
                 . $class . '>' . $item . '</a></li>';
-
         }
-
         $html .= '</ol>';
+        $this->verbose("linkify: html: $html");
 
-
-        return $list;
+        return $html;
     }
 }
