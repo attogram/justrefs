@@ -10,8 +10,7 @@ $this->include('html_head');
 ?><div class="body">
 <h1>Just Refs</h1>
 <ul>
-<li>View just the <b>references</b> and <b>related topics</b> 
-    extracted from any page on the English Wikipedia.</li>
+<li>Extract just the <b>references</b> and <b>related topics</b> from any page on the English Wikipedia.</li>
 <li>Remove the distraction of prose written by others!</li>
 <li><a href="about/">More <b>about</b> this site.</a></li>
 </ul>
