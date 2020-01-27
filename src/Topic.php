@@ -112,7 +112,7 @@ class Topic extends Base
         foreach (array_keys($this->vars) as $index) {
             //$this->verbose('setTemplateVars: vars.' . $index . ' ' . count($this->vars[$index]));
             // set counts
-            $this->template->set('count_' . $index, count($this->vars[$index]));
+            $this->template->set($index . '_count', count($this->vars[$index]));
             // sort var lists alphabetically
             sort($this->vars[$index]);
             // set html list

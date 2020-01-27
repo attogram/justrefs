@@ -8,6 +8,8 @@ declare(strict_types = 1);
 
 namespace Attogram\Justrefs;
 
+use Exception;
+
 use function is_readable;
 use function is_string;
 
@@ -28,7 +30,7 @@ class Template extends Base
      * @param string $name
      * @return bool
      */
-    public function include(string $name): bool
+    public function include(string $name)
     {
         $template = $this->templateDirectory . $name . '.php';
         if (!is_readable($template)) {
@@ -36,7 +38,7 @@ class Template extends Base
         }
         try {
             include($template);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return false;
         }
 
@@ -48,7 +50,7 @@ class Template extends Base
      * @param string $name
      * @param mixed $value
      */
-    public function set(string $name, $value): bool
+    public function set(string $name, $value)
     {
         if (!is_string($name)) {
             return false;

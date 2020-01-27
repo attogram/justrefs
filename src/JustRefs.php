@@ -22,15 +22,12 @@ class JustRefs extends Base
     public function route()
     {
         $this->startTimer('page');
-
         $this->initRouter();
         $this->initTemplate();
-
         $match = $this->router->match();
         if (!$match) {
             $this->error404('Page Not Found'); // exits
         }
-
         switch ($match) {
             case 'topic':
                 $topic = new Topic();
