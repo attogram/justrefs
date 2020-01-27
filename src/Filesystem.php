@@ -75,7 +75,7 @@ class Filesystem extends Base
             $this->verbose("get: ERROR: JSON DECODE FAILED: $name - $path");
             return false;
         }
-        $this->verbose("get: $name - $path - " . count($data));
+        $this->verbose("get: $name - " . count($data) . " - $path");
 
         return $data;
     }

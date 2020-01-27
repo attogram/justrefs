@@ -9,7 +9,6 @@ declare(strict_types = 1);
 namespace Attogram\Justrefs;
 
 use function get_class;
-use function gmdate;
 use function htmlentities;
 use function microtime;
 use function print_r;
@@ -17,7 +16,7 @@ use function round;
 
 class Base
 {
-    const VERSION = '0.4.1';
+    const VERSION = '0.4.2';
 
     public $verbose; // @param bool $verbose - print verbose debug messages to STDOUT
     public $router; // Attogram\Router\Router
@@ -25,6 +24,7 @@ class Base
 
     protected $topic;
     protected $siteName = 'Just Refs'; // @param string $siteName - The Name of the site!
+    protected $source = 'https://en.wikipedia.org/wiki/'; // @param string $source - extraction source url
     protected $basePath = // @param string $basePath - path to cache directory
         '..' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR;
     protected $timer = []; // @param array $timer - array of start times
@@ -37,7 +37,7 @@ class Base
     protected function verbose($message = '')
     {
         if ($this->verbose) {
-            print '<pre>' . gmdate('Y-m-d H:i:s') . ': ' . get_class($this) 
+            print '<pre>' . (new \DateTime())->format('u') . ': ' . get_class($this) 
                 . ': ' . htmlentities(print_r($message, true)) . '</pre>';
         }
     }
