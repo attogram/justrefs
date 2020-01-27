@@ -18,7 +18,7 @@ use function substr;
 class Topic extends Base
 {
     private $data = []; // topic data
-    private $vars = []; // template vars
+    private $vars = []; // template variables
 
     /**
      * Get a topic
@@ -104,13 +104,13 @@ class Topic extends Base
     {
         $this->initVars();
         $this->setNamespaces();
-        $this->setVarsRefs();
-        $this->setVarsTemplates();
-        $this->setVarsTemplateExists();
+        $this->setRefs();
+        $this->setTemplates();
+        $this->setTemplateExists();
         $this->removeTemplateTopics();
 
         foreach (array_keys($this->vars) as $index) {
-            $this->verbose('setTemplateVars: vars.' . $index . ' ' . count($this->vars[$index]));
+            //$this->verbose('setTemplateVars: vars.' . $index . ' ' . count($this->vars[$index]));
             // set counts
             $this->template->set('count_' . $index, count($this->vars[$index]));
             // sort var lists alphabetically
@@ -120,10 +120,7 @@ class Topic extends Base
             // set template vars
             $this->template->set($index, $this->vars[$index]);
         }
-
         $this->verbose('setTemplateVars: vars: # ' . count($this->vars));
-
-
     }
 
     private function initVars()
@@ -241,33 +238,34 @@ class Topic extends Base
 
     }
 
-    private function setVarsTemplateExists()
+    private function setTemplateExists()
     {
-        $this->verbose('setVarsTemplateExists: vars.template: # ' . count($this->vars['template']));
+        $this->verbose('setTemplateExists: vars.template: # ' . count($this->vars['template']));
         foreach ($this->vars['template'] as $item) {
-            $this->verbose('setVarsTemplateExists: check: ' . $item);
+            //$this->verbose('setTemplateExists: check: ' . $item);
             if ($this->filesystem->exists($item)) {
                 $this->vars['exists'][] = $item;
             }
         }
-        $this->verbose('setVarsTemplateExists: vars.exists: ' . print_r($this->vars['exists'], true));
+        $this->verbose('setTemplateExists: vars.exists: # ' . count($this->vars['exists']));
+        //$this->verbose('setTemplateExists: vars.exists: ' . print_r($this->vars['exists'], true));
     }
 
-    private function setVarsRefs()
+    private function setRefs()
     {
-        $this->verbose('setVarsRefs: data.refs: # ' . count($this->data['refs']));
+        $this->verbose('setRefs: data.refs: # ' . count($this->data['refs']));
         foreach ($this->data['refs'] as $ref) {
             if (substr($ref, 0, 2) == '//') {
                 $ref = 'https:' . $ref;
             }
             $this->vars['refs'][] = $ref;
         }
-        $this->verbose('setVarsRefs: vars.refs: # ' . count($this->vars['refs']));
+        $this->verbose('setRefs: vars.refs: # ' . count($this->vars['refs']));
     }
 
-    private function setVarsTemplates()
+    private function setTemplates()
     {
-        $this->verbose('setVarsTemplates: data.templates: # ' . count($this->data['templates']));
+        $this->verbose('setTemplates: data.templates: # ' . count($this->data['templates']));
         foreach ($this->data['templates'] as $item) {
             switch ($item['ns']) {
                 case '0': // Main
@@ -285,9 +283,9 @@ class Topic extends Base
                     break;
             }
         }
-        $this->verbose('setVarsTemplates: vars.main: # ' . count($this->vars['main']));
-        $this->verbose('setVarsTemplates: vars.template_secondary: # ' . count($this->vars['template_secondary']));
-        $this->verbose('setVarsTemplates: vars.module: # ' . count($this->vars['module']));
+        $this->verbose('setTemplates: vars.main: # ' . count($this->vars['main']));
+        $this->verbose('setTemplates: vars.template_secondary: # ' . count($this->vars['template_secondary']));
+        $this->verbose('setTemplates: vars.module: # ' . count($this->vars['module']));
     }
 
     private function removeTemplateTopics() {
@@ -335,19 +333,21 @@ class Topic extends Base
      */
     private function listify($index, $list)
     {
-        $this->verbose("listify: index: $index count.list: " . count($list));
-
+        //$this->verbose("listify: index: $index count.list: " . count($list));
         switch ($index) {
             case 'exists':
             case 'missing':
-                return;
+                return '';
+        }    
+        if (empty($list)) {
+            return '';
         }
-    
+
         $html = '<ol>';
         foreach ($list as $item) {
             //$this->verbose('listify: ' . $item);            
             // Link to external reference
-            if ($index == 'main') {
+            if ($index == 'refs') {
               $html .= '<li><a href="' . $item . '" target="_blank">' . $item . '</li>';
               continue;
             }
@@ -371,7 +371,7 @@ class Topic extends Base
                 . $class . '>' . $item . '</a></li>';
         }
         $html .= '</ol>';
-        $this->verbose("linkify: html: $html");
+        //$this->verbose("listify: html: $html");
 
         return $html;
     }
