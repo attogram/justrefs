@@ -39,14 +39,12 @@ class Filesystem extends Base
             return false;
         }
         if (!file_exists($path)) {
-            //$this->verbose('exists: NOT FOUND: ' . $name);
             return false;
         }
         if (!is_readable($path)) {
             $this->verbose('exists: NOT READABLE: ' . $path);
             return false;
         }
-        //$this->verbose("exists: $name - $path");
         return true;
     }
 
@@ -94,7 +92,6 @@ class Filesystem extends Base
         foreach ($parts as $part) {
             $dir .= $part . DIRECTORY_SEPARATOR;
             if (!is_dir($dir)) {
-                //$this->verbose('set: mkdir: ' . $dir);
                 mkdir($dir);
             }
         }
@@ -104,6 +101,7 @@ class Filesystem extends Base
             return false;
         }
         $this->verbose("set: $name - $path - $bytes");
+
         return true;
     }
 
@@ -116,17 +114,20 @@ class Filesystem extends Base
         $this->verbose('delete: name: ' . $name);
         if (!$this->exists($name)) {
             $this->verbose('delete: ERROR: does not exist');
+
             return false;
         }
         $file = $this->getPath($name);
         if (!$file) {
             $this->verbose('delete: ERROR: path empty');
+
             return false;
         }
         if (unlink($file)) {
             return true;
         }
         $this->verbose('delete: ERROR: unlink failed');
+    
         return false;
     }
 
@@ -138,13 +139,16 @@ class Filesystem extends Base
     {
         if (!$this->exists($name)) {
             $this->verbose('age: ERROR: NOT FOUND: ' . $name);
+
             return false;
         }
         $file = $this->getPath($name);
         if (!$file) {
             $this->verbose('age: ERROR: NO PATH: ' . $file);
+
             return false;
         }
+
         return filemtime($file);
     }
 
@@ -157,19 +161,23 @@ class Filesystem extends Base
         $md5 = md5($name);
         if (empty($md5)) {
             $this->verbose('getPath: ERROR: md5 failed');
+
             return '';
         }
         $first = substr($md5, 0, 1);
         if (!strlen($first)) {
             $this->verbose('getPath: ERROR: extract first failed');
+
             return '';
         }
         $second = substr($md5, 1, 2);
         if (!strlen($second) == 2) {
             $this->verbose('getPath: ERROR: extract second failed');
+
             return '';
         }
         $path = $this->basePath . $first . DIRECTORY_SEPARATOR . $second . DIRECTORY_SEPARATOR . $md5 . '.gz';
+
         return $path;
     }
 }

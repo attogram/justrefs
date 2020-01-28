@@ -27,9 +27,7 @@ class Refresh extends Base
         if (!$this->filesystem->exists($this->topic)) {
             $this->error404('Cache File Not Found');
         }
-
         $this->template->set('title', 'Refresh');
-
         if (!empty($_POST)) {
             $answer = isset($_POST['d']) ? $_POST['d'] : '';
             if (!strlen($answer)) {
@@ -58,12 +56,9 @@ class Refresh extends Base
             $this->template->include('footer');
             return;
         }
-
         $this->template->include('html_head');
         $this->template->include('header');
-
-        print '<div class="body">';
-        print '<p><b><a href="'
+        print '<div class="body"><p><b><a href="'
             . $this->template->get('home') . $this->getLink($this->topic) . '">'
             . $this->topic . '</a></b> is currently cached.</p>';
         $letterOne = chr(rand(65,90));
@@ -78,10 +73,8 @@ class Refresh extends Base
             . "If $letterOne = $numOne and $letterTwo = $numTwo"
             . " then  $letterOne + $letterTwo = "
             . '<input name="d" value="" size="4">'
-            . '<br /><br />'
-            . '<input type="submit" value="    Delete Cache    ">'
-            . '</form><br />';
-        print '</div>';
+            . '<br /><br /><input type="submit" value="    Delete Cache    ">'
+            . '</form><br /></div>';
         $this->template->include('footer');
     }
 }

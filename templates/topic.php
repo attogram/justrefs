@@ -63,7 +63,7 @@ $this->include('header');
     <?= $this->get('help_list') ?>
   </div>
   <div class="rcol">
-    <a name="template_secondary"><b><?= $this->get('template_secondary_count') ?></b> Support-Templates:</a><br />
+    <a name="template_secondary"><b><?= $this->get('template_secondary_count') ?></b> Secondary-Templates:</a><br />
     <?= $this->get('template_secondary_list') ?><br /><hr />
     <a name="module"><b><?= $this->get('module_count') ?></b> Modules:</a><br />
     <?= $this->get('module_list') ?>

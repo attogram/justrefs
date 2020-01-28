@@ -8,6 +8,8 @@ declare(strict_types = 1);
 
 namespace Attogram\Justrefs;
 
+use Attogram\Router\Router;
+
 use function is_string;
 use function strlen;
 use function trim;
@@ -61,7 +63,7 @@ class JustRefs extends Base
 
     private function initRouter()
     {
-        $this->router = new \Attogram\Router\Router();
+        $this->router = new Router();
         $this->router->allow('/', 'home');
         $this->router->allow('/r/?', 'topic');
         $this->router->allow('/r/?/?', 'topic');

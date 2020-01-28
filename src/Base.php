@@ -54,10 +54,10 @@ class Base
     /**
      * @param string $query
      * @return string
+     * @see https://www.mediawiki.org/wiki/Manual:PAGENAMEE_encoding
      */
     protected function encodeLink($query)
     {
-        // @see https://www.mediawiki.org/wiki/Manual:PAGENAMEE_encoding
         $replacers = [
             ' ' => '_',
             '%' => '%25', // do first before any other %## replacers
@@ -75,6 +75,7 @@ class Base
         foreach ($replacers as $old => $new) {
             $query = str_replace($old, $new, $query);
         }
+
         return $query;
     }
 
@@ -98,6 +99,7 @@ class Base
         }
         if (!is_string($this->topic) || !strlen($this->topic)) {
             $this->topic = '';
+    
             return;
         }
         // format query
@@ -154,13 +156,12 @@ class Base
         $this->template->include('header');
         print '<div class="body"><h1>Error 404</h1><h2>' . $message . '</h2>';
         if ($refresh) {
-            print '<p><small><a href="'
-                . $this->template->get('home') . 'refresh/'
-                . $this->encodeLink($refresh)
-                . '">Attempt Refresh</a></small></p>';
+            print '<p><small><a href="' . $this->template->get('home') . 'refresh/'
+                . $this->encodeLink($refresh) . '">Attempt Refresh</a></small></p>';
         }
         print '</div>';
         $this->template->include('footer');
+
         exit;
     }
 }
