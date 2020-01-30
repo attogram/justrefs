@@ -4,7 +4,7 @@
  *
  * Public Index Page
  */
-$verbose = true;
+$verbose = false;
 
 $vendor = '../vendor/autoload.php';
 if (!is_readable($vendor)) {
