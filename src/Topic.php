@@ -298,25 +298,21 @@ class Topic extends Base
      */
     private function listify($index)
     {
-        switch ($index) {
-            case 'exists':
-            case 'missing':
-                return '';
-            default:
-                break;
+        if (in_array($index, ['exists', 'missing'])) {
+            return ''; // skip internal-usage vars
         }
         if (empty($this->vars[$index])) {
-            return '';
+            return ''; // Error - index not found, or index empty
         }
         $html = '<ol>';
         foreach ($this->vars[$index] as $item) {
-            // Link to external reference
             if ($index == 'refs') {
+                // Link to external reference
                 $html .= '<li><a href="' . $item . '" target="_blank">' . $item . '</li>';
                 continue;
             }
-            // non-existing page
             if (in_array($item, $this->vars['missing'])) {
+                // non-existing page
                 $html .= '<li><span class="red">' . $item . '</span></li>';
                 continue;
             }
@@ -329,8 +325,7 @@ class Topic extends Base
             $html .= '<li><a href="' . $this->template->get('home')
                 . $this->getLink($item) . '"' . $class . '>' . $item . '</a></li>';
         }
-        $html .= '</ol>';
 
-        return $html;
+        return $html . '</ol>';
     }
 }

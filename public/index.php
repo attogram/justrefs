@@ -4,7 +4,7 @@
  *
  * Public Index Page
  */
-$verbose = false;
+$verbose = true;
 
 $vendor = '../vendor/autoload.php';
 if (!is_readable($vendor)) {
@@ -12,6 +12,5 @@ if (!is_readable($vendor)) {
 }
 require_once($vendor);
 
-$jr = new \Attogram\Justrefs\JustRefs();
-$jr->verbose = $verbose;
+$jr = new \Attogram\Justrefs\JustRefs($verbose);
 $jr->route();
