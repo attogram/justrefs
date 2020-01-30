@@ -16,12 +16,12 @@ use function round;
 
 class Base
 {
-    const VERSION = '0.4.5';
+    const VERSION = '0.4.6';
 
     /**
      * @var bool - print verbose debug messages to STDOUT
      */
-    public $verbose;
+    public $verbose = false;
 
     /**
      * @var Attogram\Router\Router
@@ -67,6 +67,16 @@ class Base
      * @var string - page topic
      */
     protected $topic;
+
+    /**
+     * @param bool $verbose (optional, default false)
+     */
+    public function __construct($verbose = false)
+    {
+        if ($verbose) {
+            $this->verbose = true;
+        }
+    }
 
     /**
      * @param string $message (optional)
@@ -150,14 +160,12 @@ class Base
 
     protected function initFilesystem()
     {
-        $this->filesystem = new Filesystem();
-        $this->filesystem->verbose = $this->verbose;
+        $this->filesystem = new Filesystem($this->verbose);
     }
 
     protected function initMediawiki()
     {
-        $this->mediawiki = new Mediawiki();
-        $this->mediawiki->verbose = $this->verbose;
+        $this->mediawiki = new Mediawiki($this->verbose);
     }
 
     /**

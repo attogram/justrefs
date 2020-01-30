@@ -33,10 +33,17 @@ class JustRefs extends Base
         if (!$match) {
             $this->error404('Page Not Found'); // exits
         }
+        $this->match($match);
+    }
+
+    /**
+     * @param string $match
+     */
+    private function match($match)
+    {
         switch ($match) {
             case 'topic':
-                $topic = new Topic();
-                $topic->verbose = $this->verbose;
+                $topic = new Topic($this->verbose);
                 $topic->template = $this->template;
                 $topic->router = $this->router; // setTopicFromUrl() needs router
                 $topic->get();
@@ -47,7 +54,7 @@ class JustRefs extends Base
                     $this->template->include('home');
                     break;
                 }
-                $search = new Search();
+                $search = new Search($this->verbose);
                 $search->template = $this->template;
                 $search->get($this->query);
                 break;
@@ -56,7 +63,7 @@ class JustRefs extends Base
                 $this->template->include('about');
                 break;
             case 'refresh':
-                $refresh = new Refresh();
+                $refresh = new Refresh($this->verbose);
                 $refresh->template = $this->template;
                 $refresh->router = $this->router;
                 $refresh->get();
@@ -84,8 +91,7 @@ class JustRefs extends Base
 
     private function initTemplate()
     {
-        $this->template = new Template();
-        $this->template->verbose = $this->verbose;
+        $this->template = new Template($this->verbose);
         $this->template->timer = $this->timer;
         $this->template->set('home', $this->router->getHome());
         $this->template->set('title', $this->siteName);
