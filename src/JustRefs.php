@@ -58,6 +58,8 @@ class JustRefs extends Base
                 $refresh->router = $this->router;
                 $refresh->refresh();
                 break;
+            default:
+                break;
         }
     }
 

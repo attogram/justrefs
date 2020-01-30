@@ -37,7 +37,7 @@ class Base
     protected function verbose($message = '')
     {
         if ($this->verbose) {
-            print '<pre>' . (new \DateTime())->format('u') . ': ' . get_class($this) 
+            print '<pre>' . (new \DateTime())->format('u') . ': ' . get_class($this)
                 . ': ' . htmlentities(print_r($message, true)) . '</pre>';
         }
     }

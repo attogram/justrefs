@@ -36,7 +36,7 @@ a:active {
   background-color:yellow;
   color:black;
 }
-a.missing {
+.missing {
   color:blueviolet;
 }
 .head {
@@ -59,11 +59,12 @@ a.missing {
   padding-left:10px;
 }
 h1 {
+  font-family:sans-serif;
   margin:0;
-  padding-top:5px;
   padding-bottom:10px;
+  padding-top:5px;
 }
-h1, p {
+p {
   font-family:sans-serif;
 }
 hr {

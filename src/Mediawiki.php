@@ -38,7 +38,7 @@ class Mediawiki extends Base
         }
         $result = [];
         if (isset($data['error'])
-            || !isset($data['parse']['title']) 
+            || !isset($data['parse']['title'])
             || empty($data['parse']['title'])
         ) {
             $result['title'] = $query;
@@ -54,7 +54,7 @@ class Mediawiki extends Base
             ? $data['parse']['externallinks']
             : [];
         $this->verbose('links: refs: ' . count($result['refs']));
-        // set related topics 
+        // set related topics
         $result['topics'] = isset($data['parse']['links'])
             ? $data['parse']['links']
             : [];
@@ -101,11 +101,11 @@ class Mediawiki extends Base
             $this->verbose('getApi: ERROR: invalid url: ' . print_r($url, true));
             return false;
         }
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent); 
-        $jsonData = curl_exec($ch);
-        curl_close($ch);
+        $curl = curl_init($url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_USERAGENT, $this->userAgent);
+        $jsonData = curl_exec($curl);
+        curl_close($curl);
         if (empty($jsonData)) {
             $this->verbose("getApi: ERROR: EMPTY RESULT: $url");
             return false;
