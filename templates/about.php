@@ -6,7 +6,7 @@
  * @uses $this - Attogram\Justrefs\Template
  */
 
-$this->include('html_head'); 
+$this->include('html_head');
 $this->include('header');
 
 ?><div class="body">

@@ -75,7 +75,6 @@ class Refresh extends Base
         $numOne = rand(0, 10);          // random number 0-10
         $letterTwo = chr(rand(65, 90)); // random letter A-Z
         $numTwo = rand(0, 10);          // random number 0-10
-        $answer = $numOne + $numTwo;
         print '<form method="POST">'
             . '<input type="hidden" name="a" value="' . $numOne . '">'
             . '<input type="hidden" name="b" value="' . $numTwo . '">'
