@@ -31,7 +31,7 @@ class Filesystem extends Base
      * @param string $name
      * @return bool
      */
-    public function exists($name) 
+    public function exists($name)
     {
         $path = $this->getPath($name);
         if (empty($path)) {
@@ -83,7 +83,7 @@ class Filesystem extends Base
      * @param string $value
      * @return bool
      */
-    public function set($name, $value) 
+    public function set($name, $value)
     {
         $path = $this->getPath($name);
         $parts = explode(DIRECTORY_SEPARATOR, $path);

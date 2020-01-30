@@ -51,7 +51,7 @@ class Refresh extends Base
             $this->template->include('html_head');
             $this->template->include('header');
             print '<div class="body"><p>OK - cache deleted</p>'
-                . '<p><a href="' . $this->template->get('home') . $this->getLink($this->topic) . '">' 
+                . '<p><a href="' . $this->template->get('home') . $this->getLink($this->topic) . '">'
                 . $this->topic . '</a></p></div>';
             $this->template->include('footer');
             return;
@@ -61,10 +61,10 @@ class Refresh extends Base
         print '<div class="body"><p><b><a href="'
             . $this->template->get('home') . $this->getLink($this->topic) . '">'
             . $this->topic . '</a></b> is currently cached.</p>';
-        $letterOne = chr(rand(65,90));
-        $numOne = rand(0, 10);
-        $letterTwo = chr(rand(65,90));
-        $numTwo = rand(0, 10);
+        $letterOne = chr(rand(65, 90)); // random letter A-Z
+        $numOne = rand(0, 10);          // random number 0-10
+        $letterTwo = chr(rand(65, 90)); // random letter A-Z
+        $numTwo = rand(0, 10);          // random number 0-10
         $answer = $numOne + $numTwo;
         print '<form method="POST">'
             . '<input type="hidden" name="a" value="' . $numOne . '">'

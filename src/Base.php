@@ -16,7 +16,7 @@ use function round;
 
 class Base
 {
-    const VERSION = '0.4.3';
+    const VERSION = '0.4.4';
 
     public $verbose; // @param bool $verbose - print verbose debug messages to STDOUT
     public $router; // Attogram\Router\Router
@@ -37,7 +37,7 @@ class Base
     protected function verbose($message = '')
     {
         if ($this->verbose) {
-            print '<pre>' . (new \DateTime())->format('u') . ': ' . get_class($this) 
+            print '<pre>' . (new \DateTime())->format('u') . ': ' . get_class($this)
                 . ': ' . htmlentities(print_r($message, true)) . '</pre>';
         }
     }

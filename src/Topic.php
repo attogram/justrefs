@@ -47,7 +47,7 @@ class Topic extends Base
         $this->setDataFromApi();
         if ($this->data) {
             // save results to cache
-            $this->filesystem->set($this->topic, json_encode($this->data)); 
+            $this->filesystem->set($this->topic, json_encode($this->data));
             if (!empty($this->data['error'])) {
                 $this->error404('Topic Not Found', $this->topic);
                 return;
@@ -96,7 +96,10 @@ class Topic extends Base
         }
         $this->template->set('dataAge', $this->dataAge);
         $this->template->set('now', gmdate('Y-m-d H:i:s'));
-        $this->template->set('refresh', $this->template->get('home') . 'refresh/' . $this->encodeLink($this->data['title']));
+        $this->template->set(
+            'refresh',
+            $this->template->get('home') . 'refresh/' . $this->encodeLink($this->data['title'])
+        );
         $this->template->set('h1', $this->data['title']);
         $this->template->set('title', $this->data['title'] . ' - ' . $this->siteName);
         $this->template->include('topic');
@@ -122,7 +125,7 @@ class Topic extends Base
 
     private function initVars()
     {
-        $ns = [
+        $namespaces = [
             'main', 'talk',
             'template', 'template_talk',
             'portal', 'portal_talk',
@@ -137,7 +140,7 @@ class Topic extends Base
             'main_secondary',
             'template_secondary',
         ];
-        foreach ($ns as $index) {
+        foreach ($namespaces as $index) {
             $this->vars[$index] = [];
         }
     }
@@ -221,7 +224,7 @@ class Topic extends Base
                     break;
                 default:
                     break; // exclucde
-            }                
+            }
         }
     }
 
@@ -261,11 +264,14 @@ class Topic extends Base
                 case '828': // Module:
                     $this->vars['module'][] = $item['*'];
                     break;
+                default:
+                    break;
             }
         }
     }
 
-    private function removeTemplateTopics() {
+    private function removeTemplateTopics()
+    {
         if (empty($this->vars['main'])) {
             return;
         }
@@ -284,12 +290,11 @@ class Topic extends Base
                 continue; // error malformed data
             }
             foreach ($templateData['topics'] as $exTopic) {
-                if ($exTopic['ns'] == '0') { // main namespace only
+                if ($exTopic['ns'] == '0' && in_array($exTopic['*'], $this->vars['main'])) {
+                    // main namespace only
                     // remove this template topic from master topic list
-                    if (in_array($exTopic['*'], $this->vars['main'])) {
-                        unset($this->vars['main'][array_search($exTopic['*'], $this->vars['main'])]);
-                        $this->vars['main_secondary'][] = $exTopic['*'];
-                    }
+                    unset($this->vars['main'][array_search($exTopic['*'], $this->vars['main'])]);
+                    $this->vars['main_secondary'][] = $exTopic['*'];
                 }
             }
         }
@@ -305,7 +310,9 @@ class Topic extends Base
             case 'exists':
             case 'missing':
                 return '';
-        }    
+            default:
+                break;
+        }
         if (empty($this->vars[$index])) {
             return '';
         }
@@ -313,8 +320,8 @@ class Topic extends Base
         foreach ($this->vars[$index] as $item) {
             // Link to external reference
             if ($index == 'refs') {
-              $html .= '<li><a href="' . $item . '" target="_blank">' . $item . '</li>';
-              continue;
+                $html .= '<li><a href="' . $item . '" target="_blank">' . $item . '</li>';
+                continue;
             }
             // non-existing page
             if (in_array($item, $this->vars['missing'])) { 
@@ -323,15 +330,12 @@ class Topic extends Base
             }
             // Link to internal page
             $class = '';
-            if ($index == 'template') {
-                if (!in_array($item, $this->vars['exists'])) {
-                    $class = ' class="missing"';
-                }
+            if ($index == 'template' && !in_array($item, $this->vars['exists'])) {
+                // template is not loaded, thus possible that secondary-topics not all set
+                $class = ' class="missing"';
             }
-            $html .= '<li><a href="' 
-                . $this->template->get('home')
-                . $this->getLink($item) . '"' 
-                . $class . '>' . $item . '</a></li>';
+            $html .= '<li><a href="' . $this->template->get('home')
+                . $this->getLink($item) . '"' . $class . '>' . $item . '</a></li>';
         }
         $html .= '</ol>';
 
