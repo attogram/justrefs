@@ -36,9 +36,7 @@ class Mediawiki extends Base
             $this->verbose('links: ERROR: decode failed: ' . $query);
             return false;
         }
-
         $result = [];
-
         if (isset($data['error'])
             || !isset($data['parse']['title']) 
             || empty($data['parse']['title'])
@@ -48,23 +46,19 @@ class Mediawiki extends Base
             $this->verbose('links: ERROR: 404 NOT FOUND: ' . $query);
             return $result;
         }
-
         // set title
         $result['title'] = $data['parse']['title'];
         $this->verbose('links: title: ' . $result['title']);
-
         // set reference links
         $result['refs'] = isset($data['parse']['externallinks'])
             ? $data['parse']['externallinks']
             : [];
         $this->verbose('links: refs: ' . count($result['refs']));
-
         // set related topics 
         $result['topics'] = isset($data['parse']['links'])
             ? $data['parse']['links']
             : [];
         $this->verbose('links: topics: ' . count($result['topics']));
-
         // set templates
         $result['templates'] = isset($data['parse']['templates'])
             ? $data['parse']['templates']
@@ -81,11 +75,8 @@ class Mediawiki extends Base
     public function search($query)
     {
         $data = $this->getApi($this->api . $this->apiSearch . urlencode($query));
-        if (!$data
-            || !is_array($data)
-            || empty($data['query'])
-            || empty($data['query']['search'])
-            || !is_array($data['query']['search'])
+        if (!$data || !is_array($data) || empty($data['query'])
+            || empty($data['query']['search']) || !is_array($data['query']['search'])
         ) {
             return false;
         }
@@ -96,6 +87,7 @@ class Mediawiki extends Base
             }
             $results[] = $topic['title'];
         }
+
         return $results;
     }
 
@@ -118,7 +110,6 @@ class Mediawiki extends Base
             $this->verbose("getApi: ERROR: EMPTY RESULT: $url");
             return false;
         }
-        //$this->verbose('getApi: OK: ' . $url . ' - ' . strlen($jsonData));
         $data = @json_decode($jsonData, true);
         if (!is_array($data)) {
             $this->verbose("getApi: ERROR: DECODE FAILED: url: $url jsonData: $jsonData");
