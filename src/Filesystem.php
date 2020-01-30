@@ -52,7 +52,7 @@ class Filesystem extends Base
      * @param string $name
      * @return array|false
      */
-    public function get($name) 
+    public function get($name)
     {
         if (!$this->exists($name)) {
             $this->verbose("get: NOT FOUND: $name");
