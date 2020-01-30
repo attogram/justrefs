@@ -16,20 +16,57 @@ use function round;
 
 class Base
 {
-    const VERSION = '0.4.4';
+    const VERSION = '0.4.5';
 
-    public $verbose; // @param bool $verbose - print verbose debug messages to STDOUT
-    public $router; // Attogram\Router\Router
-    public $template;   // Attogram\Justrefs\Template
+    /**
+     * @var bool - print verbose debug messages to STDOUT
+     */
+    public $verbose;
 
+    /**
+     * @var Attogram\Router\Router
+     */
+    public $router;
+
+    /**
+     * @var Attogram\Justrefs\Template
+     */
+    public $template;
+
+    /**
+     * @var Attogram\Justrefs\Filesystem
+     */
+    protected $filesystem;
+
+    /**
+     * @var Attogram\Justrefs\Mediawiki
+     */
+    protected $mediawiki;
+
+    /**
+     * @var string - The Name of the site!
+     */
+    protected $siteName = 'Just Refs';
+
+    /**
+     * @var string - extraction source url
+     */
+    protected $source = 'https://en.wikipedia.org/wiki/';
+
+    /**
+     * @var string - path to cache directory
+     */
+    protected $basePath = '..' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR;
+
+    /**
+     * @var array - array of start times
+     */
+    protected $timer = [];
+
+    /**
+     * @var string - page topic
+     */
     protected $topic;
-    protected $siteName = 'Just Refs'; // @param string $siteName - The Name of the site!
-    protected $source = 'https://en.wikipedia.org/wiki/'; // @param string $source - extraction source url
-    protected $basePath = // @param string $basePath - path to cache directory
-        '..' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR;
-    protected $timer = []; // @param array $timer - array of start times
-    protected $filesystem; // Attogram\Justrefs\Filesystem
-    protected $mediawiki;  // Attogram\Justrefs\Mediawiki
 
     /**
      * @param string $message (optional)
@@ -146,7 +183,7 @@ class Base
 
     /**
      * @param string $message
-     * @param string $reresh - refresh query link
+     * @param string $refresh - refresh query link
      * @return void
      */
     public function error404($message = 'Page Not Found', $refresh = '')

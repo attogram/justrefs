@@ -16,7 +16,10 @@ use function trim;
 
 class JustRefs extends Base
 {
-    private $query = ''; // current query
+    /**
+     * @var string - the current query
+     */
+    private $query = '';
 
     /**
      * Route the current web request

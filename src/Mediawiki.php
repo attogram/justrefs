@@ -20,9 +20,24 @@ use function urlencode;
 
 class Mediawiki extends Base
 {
+    /**
+     * @var string - user agent for API requests
+     */
     private $userAgent = 'JustRefsBot/' . self::VERSION;
+
+    /**
+     * @var string - api endpoint
+     */
     private $api = 'https://en.wikipedia.org/w/api.php';
+
+    /**
+     * @var string - url params to get page links
+     */
     private $apiLinks = '?action=parse&prop=externallinks|links|templates&format=json&page=';
+
+    /**
+     * @var string - url params for search request
+     */
     private $apiSearch = '?action=query&list=search&format=json&srprop=&srlimit=50&srsearch=';
 
     /**

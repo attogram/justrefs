@@ -3,9 +3,10 @@
  * Just Refs - https://github.com/attogram/justrefs
  *
  * Topic page template
+ * @uses $this - Attogram\Justrefs\Template
  */
 
-$this->include('html_head'); 
+$this->include('html_head');
 $this->include('header');
 
 ?><div class="body">
