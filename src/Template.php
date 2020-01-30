@@ -16,12 +16,12 @@ use function is_string;
 class Template extends Base
 {
     /**
-     * @param string $templateDirectory - path to template directory, with trailing slash
+     * @var string - path to template directory, with trailing slash
      */
     private $templateDirectory = '..' . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR;
 
     /**
-     * @param array $vars - variables for use in templates
+     * @var array - variables for use in templates
      */
     private $vars = [];
 

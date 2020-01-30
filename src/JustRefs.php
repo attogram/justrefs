@@ -16,7 +16,10 @@ use function trim;
 
 class JustRefs extends Base
 {
-    private $query = ''; // current query
+    /**
+     * @var string - the current query
+     */
+    private $query = '';
 
     /**
      * Route the current web request
@@ -35,7 +38,7 @@ class JustRefs extends Base
                 $topic = new Topic();
                 $topic->verbose = $this->verbose;
                 $topic->template = $this->template;
-                $topic->router = $this->router; // topic :: setTopicFromUrl() needs router
+                $topic->router = $this->router; // setTopicFromUrl() needs router
                 $topic->get();
                 break;
             case 'home':
@@ -56,7 +59,7 @@ class JustRefs extends Base
                 $refresh = new Refresh();
                 $refresh->template = $this->template;
                 $refresh->router = $this->router;
-                $refresh->refresh();
+                $refresh->get();
                 break;
             default:
                 break;

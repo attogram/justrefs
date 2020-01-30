@@ -16,7 +16,10 @@ use function mb_strtolower;
 
 class Search extends Base
 {
-    private $searchResults; // array of search results
+    /**
+     * @var array - array of search results
+     */
+    private $searchResults;
 
     /**
      * Get search results, from Cache, or Direct API call

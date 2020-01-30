@@ -1,8 +1,8 @@
 <?php
 /**
  * Just Refs - https://github.com/attogram/justrefs
+ *
  * HTML head template
- * 
  * @uses $this - Attogram\Justrefs\Template
  */
 ?><!doctype html>

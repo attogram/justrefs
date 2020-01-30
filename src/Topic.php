@@ -172,14 +172,6 @@ class Topic extends Base
                 case '5':  // Wikipedia_talk
                     $this->vars['wikipedia_talk'][] = $topic['*'];
                     break;
-                case '6':  // File
-                    break; // exclude
-                case '7':  // File_talk
-                    break; // exclude
-                case '8':  // Mediawiki
-                    break; // exclude
-                case '9':  // Mediawiki_talk
-                    break; // exclude
                 case '10': // Template
                     $this->vars['template'][] = $topic['*'];
                     break;
@@ -192,19 +184,11 @@ class Topic extends Base
                 case '13': // Help_talk
                     $this->vars['help_talk'][] = $topic['*'];
                     break;
-                case '14': // Category
-                    break; // exclude
-                case '15': // Category_talk
-                    break; // exclude
                 case '100': // Portal
                     $this->vars['portal'][] = $topic['*'];
                     break;
                 case '101': // Portal_talk
                     $this->vars['portal_talk'][] = $topic['*'];
-                    break;
-                case '108': // Book
-                    break;
-                case '109': // Book_talk
                     break;
                 case '118': // Draft
                     $this->vars['draft'][] = $topic['*'];
@@ -212,18 +196,26 @@ class Topic extends Base
                 case '119': // Draft_talk
                     $this->vars['draft_talk'][] = $topic['*'];
                     break;
-                case '710': // TimedText
-                    break; // exclude
-                case '711': // TimedText_talk
-                    break; // exclude
                 case '828': // Module
                     $this->vars['module'][] = $topic['*'];
                     break;
                 case '829': // Module_talk
                     $this->vars['module_talk'][] = $topic['*'];
                     break;
+                /*
+                case '6':  // File
+                case '7':  // File_talk
+                case '8':  // Mediawiki
+                case '9':  // Mediawiki_talk
+                case '14': // Category
+                case '15': // Category_talk
+                case '108': // Book
+                case '109': // Book_talk
+                case '710': // TimedText
+                case '711': // TimedText_talk
+                */
                 default:
-                    break; // exclucde
+                    break;
             }
         }
     }
@@ -324,7 +316,7 @@ class Topic extends Base
                 continue;
             }
             // non-existing page
-            if (in_array($item, $this->vars['missing'])) { 
+            if (in_array($item, $this->vars['missing'])) {
                 $html .= '<li><span class="red">' . $item . '</span></li>';
                 continue;
             }
