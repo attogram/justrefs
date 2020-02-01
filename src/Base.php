@@ -9,14 +9,20 @@ declare(strict_types = 1);
 namespace Attogram\Justrefs;
 
 use function get_class;
+use function header;
 use function htmlentities;
+use function is_string;
 use function microtime;
 use function print_r;
 use function round;
+use function str_replace;
+use function strlen;
+use function trim;
+use function urldecode;
 
 class Base
 {
-    const VERSION = '0.4.9';
+    const VERSION = '0.4.10';
 
     /**
      * @var bool - print verbose debug messages to STDOUT
@@ -24,22 +30,22 @@ class Base
     public $verbose = false;
 
     /**
-     * @var \Attogram\Router\Router
+     * @var Attogram\Router\Router
      */
     public $router;
 
     /**
-     * @var \Attogram\Justrefs\Template
+     * @var Attogram\Justrefs\Template
      */
     public $template;
 
     /**
-     * @var \Attogram\Justrefs\Filesystem
+     * @var Attogram\Justrefs\Filesystem
      */
     protected $filesystem;
 
     /**
-     * @var \Attogram\Justrefs\Mediawiki
+     * @var Attogram\Justrefs\Mediawiki
      */
     protected $mediawiki;
 
@@ -56,7 +62,7 @@ class Base
     /**
      * @var string - path to cache directory
      */
-    protected $basePath = '..' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR;
+    protected $cacheDirectory = '..' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR;
 
     /**
      * @var array - array of start times
@@ -70,23 +76,49 @@ class Base
 
     /**
      * @param bool $verbose (optional, default false)
+     * @param Attogram\Router\Router $router (optional, default null)
+     * @param Attogram\Justrefs\Template $template (optional, default null)
      */
-    public function __construct($verbose = false)
+    public function __construct($verbose = false, $router = null, $template = null)
     {
         if ($verbose) {
             $this->verbose = true;
         }
+        if ($router instanceof \Attogram\Router\Router) {
+            $this->router = $router;
+        }
+        if ($template instanceof Template) {
+            $this->template = $template;
+        }
     }
 
     /**
+     * Verbose debug statement to STDOUT
      * @param string $message (optional)
      */
     protected function verbose($message = '')
     {
         if ($this->verbose) {
-            print '<pre>' . (new \DateTime())->format('u') . ': ' . get_class($this)
-                . ': ' . htmlentities(print_r($message, true)) . '</pre>';
+            print '<pre>' . $this->formatMessage($message) . '</pre>';
         }
+    }
+
+    /**
+     * Error statement to STDOUT
+     * @param string $message (optional)
+     */
+    protected function error($message = '')
+    {
+        print '<pre>ERROR: ' . $this->formatMessage($message) . '</pre>';
+    }
+
+    /**
+     * @param string $message (optional)
+     */
+    private function formatMessage($message = '')
+    {
+        return (new \DateTime())->format('u') . ': ' . get_class($this)
+            . ': ' . htmlentities(print_r($message, true));
     }
 
     /**

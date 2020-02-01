@@ -39,6 +39,8 @@ class Template extends Base
         try {
             include($template);
         } catch (Exception $exception) {
+            $this->error($exception->getMessage());
+    
             return false;
         }
 
@@ -49,6 +51,7 @@ class Template extends Base
      * set a single var
      * @param string $name
      * @param mixed $value
+     * @return bool
      */
     public function set(string $name, $value)
     {

@@ -35,14 +35,16 @@ class Filesystem extends Base
     {
         $path = $this->getPath($name);
         if (empty($path)) {
-            $this->verbose('exists: EMPTY PATH: ' . $name);
+            $this->error('exists: EMPTY PATH: ' . $name);
+
             return false;
         }
         if (!file_exists($path)) {
             return false;
         }
         if (!is_readable($path)) {
-            $this->verbose('exists: NOT READABLE: ' . $path);
+            $this->error('exists: NOT READABLE: ' . $path);
+
             return false;
         }
         return true;
@@ -55,22 +57,26 @@ class Filesystem extends Base
     public function get($name)
     {
         if (!$this->exists($name)) {
-            $this->verbose("get: NOT FOUND: $name");
+            $this->error("get: NOT FOUND: $name");
+
             return false;
         }
         $path = $this->getPath($name);
         if (empty($path)) {
-            $this->verbose("get: ERROR: EMPTY PATH: $name - $path");
+            $this->error("get: EMPTY PATH: $name - $path");
+
             return false;
         }
         $contents = @file_get_contents($path);
         if (empty($contents)) {
-            $this->verbose("get: ERROR: NO CONTENTS: $name - $path");
+            $this->error("get: NO CONTENTS: $name - $path");
+
             return false;
         }
         $data = @json_decode($contents, true);
         if (!is_array($data)) {
-            $this->verbose("get: ERROR: JSON DECODE FAILED: $name - $path");
+            $this->error("get: JSON DECODE FAILED: $name - $path");
+
             return false;
         }
         $this->verbose("get: $name - " . count($data) . " - $path");
@@ -97,7 +103,8 @@ class Filesystem extends Base
         }
         $bytes = file_put_contents($path, $value);
         if (false === $bytes) {
-            $this->verbose('set: FAILED write path: ' . $path);
+            $this->error('set: FAILED write path: ' . $path);
+
             return false;
         }
         $this->verbose("set: $name - $path - $bytes");
@@ -111,22 +118,21 @@ class Filesystem extends Base
      */
     public function delete($name)
     {
-        $this->verbose('delete: name: ' . $name);
         if (!$this->exists($name)) {
-            $this->verbose('delete: ERROR: does not exist');
+            $this->error('delete: does not exist: ' . $name);
 
             return false;
         }
         $file = $this->getPath($name);
         if (!$file) {
-            $this->verbose('delete: ERROR: path empty');
+            $this->error('delete: path empty: ' . $name);
 
             return false;
         }
         if (unlink($file)) {
             return true;
         }
-        $this->verbose('delete: ERROR: unlink failed');
+        $this->error('delete: unlink failed');
     
         return false;
     }
@@ -138,13 +144,13 @@ class Filesystem extends Base
     public function age($name)
     {
         if (!$this->exists($name)) {
-            $this->verbose('age: ERROR: NOT FOUND: ' . $name);
+            $this->error('age: NOT FOUND: ' . $name);
 
             return false;
         }
         $file = $this->getPath($name);
         if (!$file) {
-            $this->verbose('age: ERROR: NO PATH: ' . $file);
+            $this->error('age: NO PATH: ' . $file);
 
             return false;
         }
@@ -160,23 +166,23 @@ class Filesystem extends Base
     {
         $md5 = md5($name);
         if (empty($md5)) {
-            $this->verbose('getPath: ERROR: md5 failed');
+            $this->error('getPath: md5 failed: ' . $name);
 
             return '';
         }
         $first = substr($md5, 0, 1);
         if (!strlen($first)) {
-            $this->verbose('getPath: ERROR: extract first failed');
+            $this->error('getPath: extract first failed: ' . $name);
 
             return '';
         }
         $second = substr($md5, 1, 2);
         if (!strlen($second) == 2) {
-            $this->verbose('getPath: ERROR: extract second failed');
+            $this->error('getPath: extract second failed: ' . $name);
 
             return '';
         }
-        $path = $this->basePath . $first . DIRECTORY_SEPARATOR . $second . DIRECTORY_SEPARATOR . $md5 . '.gz';
+        $path = $this->cacheDirectory . $first . DIRECTORY_SEPARATOR . $second . DIRECTORY_SEPARATOR . $md5 . '.gz';
 
         return $path;
     }
