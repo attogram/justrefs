@@ -3,7 +3,7 @@
  * Just Refs - https://github.com/attogram/justrefs
  *
  * Header template
- * @uses $this - Attogram\Justrefs\Template
+ * @uses $this - \Attogram\Justrefs\Template
  */
 ?>
 <div class="head">

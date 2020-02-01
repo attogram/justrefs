@@ -3,7 +3,7 @@
  * Just Refs - https://github.com/attogram/justrefs
  * Footer template
  *
- * @uses $this - Attogram\Justrefs\Template
+ * @uses $this - \Attogram\Justrefs\Template
  */
 ?><footer>
   <b><a href="<?= $this->get('home') ?>"><?= $this->get('name') ?></a></b>

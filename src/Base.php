@@ -16,7 +16,7 @@ use function round;
 
 class Base
 {
-    const VERSION = '0.4.7';
+    const VERSION = '0.4.8';
 
     /**
      * @var bool - print verbose debug messages to STDOUT
@@ -24,22 +24,22 @@ class Base
     public $verbose = false;
 
     /**
-     * @var Attogram\Router\Router
+     * @var \Attogram\Router\Router
      */
     public $router;
 
     /**
-     * @var Attogram\Justrefs\Template
+     * @var \Attogram\Justrefs\Template
      */
     public $template;
 
     /**
-     * @var Attogram\Justrefs\Filesystem
+     * @var \Attogram\Justrefs\Filesystem
      */
     protected $filesystem;
 
     /**
-     * @var Attogram\Justrefs\Mediawiki
+     * @var \Attogram\Justrefs\Mediawiki
      */
     protected $mediawiki;
 

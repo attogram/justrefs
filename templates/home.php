@@ -3,7 +3,7 @@
  * Just Refs - https://github.com/attogram/justrefs
  *
  * Home Page template
- * @uses $this - Attogram\Justrefs\Template
+ * @uses $this - \Attogram\Justrefs\Template
  */
 
 $this->include('html_head');

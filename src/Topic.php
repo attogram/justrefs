@@ -89,12 +89,12 @@ class Topic extends Base
         // set Extraction source url
         $this->template->set('source', $this->source . $this->encodeLink($this->data['title']));
         // set Data and Cache age
-        $this->dataAge = '?';
+        $dataAge = '?';
         $age = $this->filesystem->age($this->data['title']);
         if ($age) {
-            $this->dataAge = gmdate('Y-m-d H:i:s', $age);
+            $dataAge = gmdate('Y-m-d H:i:s', $age);
         }
-        $this->template->set('dataAge', $this->dataAge);
+        $this->template->set('dataAge', $dataAge);
         $this->template->set('now', gmdate('Y-m-d H:i:s'));
         $this->template->set(
             'refresh',
@@ -298,11 +298,10 @@ class Topic extends Base
      */
     private function listify($index)
     {
-        if (in_array($index, ['exists', 'missing'])) {
-            return ''; // skip internal-usage vars
-        }
-        if (empty($this->vars[$index])) {
-            return '&nbsp;'; // Error - index not found, or index empty
+        if (in_array($index, ['exists', 'missing']) // skip internal-usage vars
+            || empty($this->vars[$index]) // Error - index not found, or index empty
+        ) {
+            return '&nbsp;'; 
         }
         $html = '<ol>';
         foreach ($this->vars[$index] as $item) {
@@ -323,7 +322,7 @@ class Topic extends Base
                 $class = ' class="missing"';
             }
             $html .= '<li><a href="' 
-                . $this->template->get('home') . $this->getLink($item) . '"' . $class . '>' 
+                . $this->template->get('home') . $this->getLink($item) . '"' . $class . '>'
                 . $item . '</a></li>';
         }
 

@@ -3,7 +3,7 @@
  * Just Refs - https://github.com/attogram/justrefs
  *
  * Topic page template
- * @uses $this - Attogram\Justrefs\Template
+ * @uses $this - \Attogram\Justrefs\Template
  */
 
 $this->include('html_head');
@@ -56,10 +56,11 @@ $this->include('header');
   <div class="lcol" id="help">
     <b><?= $this->get('help_count') ?></b> Help:<br /><?= $this->get('help_list') ?>
     <hr />
-    <b><?= $this->get('wikipedia_count') ?></b> Wikipedia:<br /><?= $this->get('wikipedial_list') ?><br />
+    <b><?= $this->get('wikipedia_count') ?></b> Wikipedia:<br /><?= $this->get('wikipedial_list') ?>
   </div>
   <div class="rcol" id="template_secondary">
-    <b><?= $this->get('template_secondary_count') ?></b> Secondary-Templates:<br /><?= $this->get('template_secondary_list') ?><br />
+    <b><?= $this->get('template_secondary_count') ?></b> Secondary-Templates:
+    <br /><?= $this->get('template_secondary_list') ?><br />
     <hr />
     <b><?= $this->get('module_count') ?></b> Modules:<br /><?= $this->get('module_list') ?>
   </div>
