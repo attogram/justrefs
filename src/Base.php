@@ -24,22 +24,22 @@ class Base
     public $verbose = false;
 
     /**
-     * @var \Attogram\Router\Router
+     * @var Attogram\Router\Router
      */
     public $router;
 
     /**
-     * @var \Attogram\Justrefs\Template
+     * @var Attogram\Justrefs\Template
      */
     public $template;
 
     /**
-     * @var \Attogram\Justrefs\Filesystem
+     * @var Attogram\Justrefs\Filesystem
      */
     protected $filesystem;
 
     /**
-     * @var \Attogram\Justrefs\Mediawiki
+     * @var Attogram\Justrefs\Mediawiki
      */
     protected $mediawiki;
 
@@ -70,11 +70,19 @@ class Base
 
     /**
      * @param bool $verbose (optional, default false)
+     * @param Attogram\Router\Router $router (optional, default null)
+     * @param Attogram\Justrefs\Template $template (optional, default null)
      */
-    public function __construct($verbose = false)
+    public function __construct($verbose = false, $router = null, $template = null)
     {
         if ($verbose) {
             $this->verbose = true;
+        }
+        if ($router instanceof \Attogram\Router\Router) {
+            $this->router = $router;
+        }
+        if ($template instanceof Template) {
+            $this->template = $template;
         }
     }
 

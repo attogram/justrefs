@@ -43,9 +43,7 @@ class JustRefs extends Base
     {
         switch ($match) {
             case 'topic':
-                $topic = new Topic($this->verbose);
-                $topic->template = $this->template;
-                $topic->router = $this->router; // setTopicFromUrl() needs router
+                $topic = new Topic($this->verbose, $this->router, $this->template);
                 $topic->get();
                 break;
             case 'home':
@@ -54,8 +52,7 @@ class JustRefs extends Base
                     $this->template->include('home');
                     break;
                 }
-                $search = new Search($this->verbose);
-                $search->template = $this->template;
+                $search = new Search($this->verbose, null, $this->template);
                 $search->get($this->query);
                 break;
             case 'about':
@@ -63,9 +60,7 @@ class JustRefs extends Base
                 $this->template->include('about');
                 break;
             case 'refresh':
-                $refresh = new Refresh($this->verbose);
-                $refresh->template = $this->template;
-                $refresh->router = $this->router;
+                $refresh = new Refresh($this->verbose, $this->router, $this->template);
                 $refresh->get();
                 break;
             default:
