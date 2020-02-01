@@ -43,8 +43,7 @@ class JustRefs extends Base
     {
         switch ($match) {
             case 'topic':
-                $topic = new Topic($this->verbose, $this->router, $this->template);
-                $topic->get();
+                (new Topic($this->verbose, $this->router, $this->template))->get();
                 break;
             case 'home':
                 $this->setQueryFromGet();
@@ -52,16 +51,14 @@ class JustRefs extends Base
                     $this->template->include('home');
                     break;
                 }
-                $search = new Search($this->verbose, null, $this->template);
-                $search->get($this->query);
+                (new Search($this->verbose, null, $this->template))->get($this->query);
                 break;
             case 'about':
                 $this->template->set('title', 'About this site');
                 $this->template->include('about');
                 break;
             case 'refresh':
-                $refresh = new Refresh($this->verbose, $this->router, $this->template);
-                $refresh->get();
+                (new Refresh($this->verbose, $this->router, $this->template))->get();
                 break;
             default:
                 break;
@@ -102,11 +99,13 @@ class JustRefs extends Base
         $this->query = $this->router->getGet('q');
         if (!$this->query || !is_string($this->query)) {
             $this->query = '';
+
             return;
         }
         $this->query = trim($this->query);
         if (!strlen($this->query)) {
             $this->query = '';
+
             return;
         }
     }

@@ -9,14 +9,20 @@ declare(strict_types = 1);
 namespace Attogram\Justrefs;
 
 use function get_class;
+use function header;
 use function htmlentities;
+use function is_string;
 use function microtime;
 use function print_r;
 use function round;
+use function str_replace;
+use function strlen;
+use function trim;
+use function urldecode;
 
 class Base
 {
-    const VERSION = '0.4.9';
+    const VERSION = '0.4.10';
 
     /**
      * @var bool - print verbose debug messages to STDOUT
@@ -106,9 +112,12 @@ class Base
         print '<pre>ERROR: ' . $this->formatMessage($message) . '</pre>';
     }
 
+    /**
+     * @param string $message (optional)
+     */
     private function formatMessage($message = '')
     {
-        return (new \DateTime())->format('u') . ': ' . get_class($this) 
+        return (new \DateTime())->format('u') . ': ' . get_class($this)
             . ': ' . htmlentities(print_r($message, true));
     }
 
