@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4c596117008e8bb33b7bd8e0ff75f075",
+    "content-hash": "472228d78f943690376bc75a10a26869",
     "packages": [
         {
             "name": "attogram/router",
-            "version": "v4.1.0",
+            "version": "v4.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/attogram/router.git",
-                "reference": "1d0ef41801f49b4e3f6ecf8d52438129fe82dda9"
+                "reference": "475f726b7673db70075ee04abda57190c5ffa0be"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/attogram/router/zipball/1d0ef41801f49b4e3f6ecf8d52438129fe82dda9",
-                "reference": "1d0ef41801f49b4e3f6ecf8d52438129fe82dda9",
+                "url": "https://api.github.com/repos/attogram/router/zipball/475f726b7673db70075ee04abda57190c5ffa0be",
+                "reference": "475f726b7673db70075ee04abda57190c5ffa0be",
                 "shasum": ""
             },
             "require": {
@@ -47,7 +47,7 @@
                 "php 7",
                 "router"
             ],
-            "time": "2019-04-07T17:59:05+00:00"
+            "time": "2020-02-01T09:23:35+00:00"
         }
     ],
     "packages-dev": [],

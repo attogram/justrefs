@@ -16,7 +16,7 @@ use function round;
 
 class Base
 {
-    const VERSION = '0.4.8';
+    const VERSION = '0.4.9';
 
     /**
      * @var bool - print verbose debug messages to STDOUT

@@ -5,7 +5,7 @@
     "license": "MIT",
     "require": {
         "lib-curl": "*",
-        "attogram/router": "^4.1"
+        "attogram/router": "^4.1.2"
     },
     "autoload": {
         "psr-4": {
