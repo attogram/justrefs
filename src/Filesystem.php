@@ -57,7 +57,7 @@ class Filesystem extends Base
     public function get($name)
     {
         if (!$this->exists($name)) {
-            $this->error("get: NOT FOUND: $name");
+            $this->verbose("get: NOT FOUND: $name");
 
             return false;
         }

@@ -22,7 +22,7 @@ use function urldecode;
 
 class Base
 {
-    const VERSION = '0.4.10';
+    const VERSION = '0.4.11';
 
     /**
      * @var bool - print verbose debug messages to STDOUT
