@@ -48,7 +48,8 @@ class Mediawiki extends Base
     {
         $data = $this->getApi($this->api . $this->apiLinks . urlencode($query));
         if (!$data || !is_array($data)) {
-            $this->verbose('links: ERROR: decode failed: ' . $query);
+            $this->error('links: decode failed: ' . $query);
+
             return false;
         }
         $result = [];
@@ -58,27 +59,18 @@ class Mediawiki extends Base
         ) {
             $result['title'] = $query;
             $result['error'] = true;
-            $this->verbose('links: ERROR: 404 NOT FOUND: ' . $query);
+            $this->error('links: 404 NOT FOUND: ' . $query);
+
             return $result;
         }
         // set title
         $result['title'] = $data['parse']['title'];
-        $this->verbose('links: title: ' . $result['title']);
         // set reference links
-        $result['refs'] = isset($data['parse']['externallinks'])
-            ? $data['parse']['externallinks']
-            : [];
-        $this->verbose('links: refs: ' . count($result['refs']));
+        $result['refs'] = isset($data['parse']['externallinks']) ? $data['parse']['externallinks']: [];
         // set related topics
-        $result['topics'] = isset($data['parse']['links'])
-            ? $data['parse']['links']
-            : [];
-        $this->verbose('links: topics: ' . count($result['topics']));
+        $result['topics'] = isset($data['parse']['links']) ? $data['parse']['links'] : [];
         // set templates
-        $result['templates'] = isset($data['parse']['templates'])
-            ? $data['parse']['templates']
-            : [];
-        $this->verbose('links: templates: ' . count($result['templates']));
+        $result['templates'] = isset($data['parse']['templates']) ? $data['parse']['templates'] : [];
 
         return $result;
     }
@@ -93,6 +85,8 @@ class Mediawiki extends Base
         if (!$data || !is_array($data) || empty($data['query'])
             || empty($data['query']['search']) || !is_array($data['query']['search'])
         ) {
+            $this->error('search: query failed');
+
             return false;
         }
         $results = [];
@@ -113,7 +107,7 @@ class Mediawiki extends Base
     private function getApi($url)
     {
         if (empty($url) || !is_string($url)) {
-            $this->verbose('getApi: ERROR: invalid url: ' . print_r($url, true));
+            $this->error('getApi: invalid url: ' . print_r($url, true));
             return false;
         }
         $curl = curl_init($url);
@@ -122,15 +116,18 @@ class Mediawiki extends Base
         $jsonData = curl_exec($curl);
         curl_close($curl);
         if (empty($jsonData)) {
-            $this->verbose("getApi: ERROR: EMPTY RESULT: $url");
+            $this->error("getApi: EMPTY RESULT: $url");
+
             return false;
         }
         $data = @json_decode($jsonData, true);
         if (!is_array($data)) {
-            $this->verbose("getApi: ERROR: DECODE FAILED: url: $url jsonData: $jsonData");
+            $this->error("getApi: DECODE FAILED: url: $url jsonData: $jsonData");
+
             return false;
         }
         $this->verbose("getApi: got: $url");
+
         return $data;
     }
 }

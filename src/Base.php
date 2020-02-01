@@ -87,14 +87,29 @@ class Base
     }
 
     /**
+     * Verbose debug statement to STDOUT
      * @param string $message (optional)
      */
     protected function verbose($message = '')
     {
         if ($this->verbose) {
-            print '<pre>' . (new \DateTime())->format('u') . ': ' . get_class($this)
-                . ': ' . htmlentities(print_r($message, true)) . '</pre>';
+            print '<pre>' . $this->formatMessage($message) . '</pre>';
         }
+    }
+
+    /**
+     * Error statement to STDOUT
+     * @param string $message (optional)
+     */
+    protected function error($message = '')
+    {
+        print '<pre>ERROR: ' . $this->formatMessage($message) . '</pre>';
+    }
+
+    private function formatMessage($message = '')
+    {
+        return (new \DateTime())->format('u') . ': ' . get_class($this) 
+            . ': ' . htmlentities(print_r($message, true));
     }
 
     /**
