@@ -301,7 +301,7 @@ class Topic extends Base
         if (in_array($index, ['exists', 'missing']) // skip internal-usage vars
             || empty($this->vars[$index]) // Error - index not found, or index empty
         ) {
-            return '&nbsp;'; 
+            return '&nbsp;';
         }
         $html = '<ol>';
         foreach ($this->vars[$index] as $item) {
@@ -321,7 +321,7 @@ class Topic extends Base
                 // template is not loaded, thus possible that secondary-topics not all set
                 $class = ' class="missing"';
             }
-            $html .= '<li><a href="' 
+            $html .= '<li><a href="'
                 . $this->template->get('home') . $this->getLink($item) . '"' . $class . '>'
                 . $item . '</a></li>';
         }
