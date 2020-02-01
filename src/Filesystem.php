@@ -183,7 +183,7 @@ class Filesystem extends Base
 
             return '';
         }
-        $path = $this->basePath . $first . DIRECTORY_SEPARATOR . $second . DIRECTORY_SEPARATOR . $md5 . '.gz';
+        $path = $this->cacheDirectory . $first . DIRECTORY_SEPARATOR . $second . DIRECTORY_SEPARATOR . $md5 . '.gz';
 
         return $path;
     }

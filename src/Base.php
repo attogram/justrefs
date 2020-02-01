@@ -62,7 +62,7 @@ class Base
     /**
      * @var string - path to cache directory
      */
-    protected $basePath = '..' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR;
+    protected $cacheDirectory = '..' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR;
 
     /**
      * @var array - array of start times
