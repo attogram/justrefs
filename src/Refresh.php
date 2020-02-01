@@ -27,7 +27,7 @@ class Refresh extends Base
             $this->error404('Cache File Not Found');
         }
         $this->template->set('title', 'Refresh');
-        if (empty($_POST)) {
+        if (empty($this->router->getPost())) {
             $this->ask();
 
             return;
@@ -37,16 +37,16 @@ class Refresh extends Base
 
     private function answer()
     {
-        $answer = isset($_POST['d']) ? $_POST['d'] : '';
+        $answer = $this->router->getPost('d');
         if (!strlen($answer)) {
             $this->error404('Answer Not Found');
         }
-        $submitTime = !empty($_POST['c']) ? intval($_POST['c']) : false;
-        if (!$submitTime || (time() - $submitTime) > 60) {
+        $submitTime = $this->router->getPost('c');
+        if (!$submitTime || (time() - intval($submitTime)) > 60) {
             $this->error404('Request Timed Out');
         }
-        $one = isset($_POST['a']) ? $_POST['a'] : '';
-        $two = isset($_POST['b']) ? $_POST['b'] : '';
+        $one = $this->router->getPost('a');
+        $two = $this->router->getPost('b');
         if (!strlen($one) || !strlen($two)) {
             $this->error404('Invalid Request');
         }
