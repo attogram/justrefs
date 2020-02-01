@@ -118,7 +118,6 @@ class Filesystem extends Base
      */
     public function delete($name)
     {
-        $this->verbose('delete: name: ' . $name);
         if (!$this->exists($name)) {
             $this->error('delete: does not exist: ' . $name);
 
