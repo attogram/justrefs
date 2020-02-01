@@ -302,13 +302,13 @@ class Topic extends Base
             return ''; // skip internal-usage vars
         }
         if (empty($this->vars[$index])) {
-            return ''; // Error - index not found, or index empty
+            return '&nbsp;'; // Error - index not found, or index empty
         }
         $html = '<ol>';
         foreach ($this->vars[$index] as $item) {
             if ($index == 'refs') {
                 // Link to external reference
-                $html .= '<li><a href="' . $item . '" target="_blank">' . $item . '</li>';
+                $html .= '<li><a href="' . $item . '" target="_blank">' . $item . '</a></li>';
                 continue;
             }
             if (in_array($item, $this->vars['missing'])) {
@@ -322,8 +322,9 @@ class Topic extends Base
                 // template is not loaded, thus possible that secondary-topics not all set
                 $class = ' class="missing"';
             }
-            $html .= '<li><a href="' . $this->template->get('home')
-                . $this->getLink($item) . '"' . $class . '>' . $item . '</a></li>';
+            $html .= '<li><a href="' 
+                . $this->template->get('home') . $this->getLink($item) . '"' . $class . '>' 
+                . $item . '</a></li>';
         }
 
         return $html . '</ol>';

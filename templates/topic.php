@@ -18,11 +18,11 @@ $this->include('header');
     <a href="#main_secondary"><b><?= $this->get('main_secondary_count') ?></b> Secondary-Topics</a>,
     <a href="#template"><b><?= $this->get('template_count') ?></b> Templates</a>
   </li>
-  <li><a href="#portal"><b><?= $this->get('portal_count') ?></b> Portals</a>,
-    <a href="#wikipedia"><b><?= $this->get('wikipedia_count') ?></b> Wikipedia</a>,
+  <li><a href="#template"><b><?= $this->get('portal_count') ?></b> Portals</a>,
+    <a href="#help"><b><?= $this->get('wikipedia_count') ?></b> Wikipedia</a>,
     <a href="#help"><b><?= $this->get('help_count') ?></b> Help</a>,
     <a href="#template_secondary"><b><?= $this->get('template_secondary_count') ?></b> Secondary-Templates</a>,
-    <a href="#module"><b><?= $this->get('module_count') ?></b> Modules</a>,
+    <a href="#template_secondary"><b><?= $this->get('module_count') ?></b> Modules</a>,
     <a href="#draft"><b><?= $this->get('draft_count') ?></b> Drafts</a>,
     <a href="#user"><b><?= $this->get('user_count') ?></b> Users</a>
   </li>
@@ -33,75 +33,65 @@ $this->include('header');
 </ul>
 <hr />
 <div class="flex-container">
-  <div class="lcol">
-    <a name="main"><b><?= $this->get('main_count') ?></b> Topics:</a><br />
-    <?= $this->get('main_list') ?>
+  <div class="lcol" id="main">
+    <b><?= $this->get('main_count') ?></b> Topics:<br /><?= $this->get('main_list') ?>
   </div>
-  <div class="rcol">
-    <a name="refs"><b><?= $this->get('refs_count') ?></b> References:</a><br />
-    <?= $this->get('refs_list') ?>
+  <div class="rcol" id="refs">
+    <b><?= $this->get('refs_count') ?></b> References:<br /><?= $this->get('refs_list') ?>
   </div>
 </div>
 <hr>
 <div class="flex-container">
-  <div class="lcol">
-    <a name="main_secondary"><b><?= $this->get('main_secondary_count') ?></b> Secondary-Topics:</a><br />
-    <?= $this->get('main_secondary_list') ?>
+  <div class="lcol" id="main_secondary">
+    <b><?= $this->get('main_secondary_count') ?></b> Secondary-Topics:<br /><?= $this->get('main_secondary_list') ?>
   </div>
-  <div class="rcol">
-    <a name="template"><b><?= $this->get('template_count') ?></b> Templates:</a><br />
-    <?= $this->get('template_list') ?><br /><hr />
-    <a name="portal"><b><?= $this->get('portal_count') ?></b> Portals:</a><br />
-    <?= $this->get('portal_list') ?>
+  <div class="rcol" id="template">
+    <b><?= $this->get('template_count') ?></b> Templates:<br /><?= $this->get('template_list') ?><br />
+    <hr />
+    <b><?= $this->get('portal_count') ?></b> Portals:<br /><?= $this->get('portal_list') ?>
   </div>
 </div>
 <hr>
 <div class="flex-container">
-  <div class="lcol">
-    <a name="wikipedia"><b><?= $this->get('wikipedia_count') ?></b> Wikipedia:</a><br />
-    <?= $this->get('wikipedial_list') ?><br /><hr />
-    <a name="help"><b><?= $this->get('help_count') ?></b> Help:</a><br />
-    <?= $this->get('help_list') ?>
+  <div class="lcol" id="help">
+    <b><?= $this->get('help_count') ?></b> Help:<br /><?= $this->get('help_list') ?>
+    <hr />
+    <b><?= $this->get('wikipedia_count') ?></b> Wikipedia:<br /><?= $this->get('wikipedial_list') ?><br />
   </div>
-  <div class="rcol">
-    <a name="template_secondary"><b><?= $this->get('template_secondary_count') ?></b> Secondary-Templates:</a><br />
-    <?= $this->get('template_secondary_list') ?><br /><hr />
-    <a name="module"><b><?= $this->get('module_count') ?></b> Modules:</a><br />
-    <?= $this->get('module_list') ?>
+  <div class="rcol" id="template_secondary">
+    <b><?= $this->get('template_secondary_count') ?></b> Secondary-Templates:<br /><?= $this->get('template_secondary_list') ?><br />
+    <hr />
+    <b><?= $this->get('module_count') ?></b> Modules:<br /><?= $this->get('module_list') ?>
+  </div>
+</div>
+<hr />
+<div class="flex-container" id="draft">
+  <div class="lcol">
+    <b><?= $this->get('draft_count') ?></b> Drafts:<br /><?= $this->get('draft_list') ?>
+  </div>
+  <div class="rcol" id="user">
+    <b><?= $this->get('user_count') ?></b> Users:<br /><?= $this->get('user_list') ?>
   </div>
 </div>
 <hr />
 <div class="flex-container">
-  <div class="lcol">
-    <a name="draft"><b><?= $this->get('draft_count') ?></b> Drafts:</a><br />
-    <?= $this->get('draft_list') ?>
+  <div class="lcol" id="talk">
+    <b><?= $this->get('talk_count') ?></b> Talk:<br /><?= $this->get('talk_list') ?><br />
+    <hr />
+    <b><?= $this->get('user_talk_count') ?></b> User talk:<br /><?= $this->get('user_talk_list') ?><br />
+    <hr />
+    <b><?= $this->get('wikipedia_talk_count') ?></b> Wikipedia talk:<br /><?= $this->get('wikipedia_talk_list') ?><br />
+    <hr />
+    <b><?= $this->get('help_talk_count') ?></b> Help talk:<br /><?= $this->get('help_talk_list') ?>
   </div>
-  <div class="rcol">
-    <a name="user"><b><?= $this->get('user_count') ?></b> Users:</a><br />
-    <?= $this->get('user_list') ?>
-  </div>
-</div>
-<hr />
-<div class="flex-container">
-  <div class="lcol">
-    <a name="talk"><b><?= $this->get('talk_count') ?></b> Talk:</a><br />
-    <?= $this->get('talk_list') ?><br /><hr />
-    <a name="user_talk"><b><?= $this->get('user_talk_count') ?></b> User talk:</a><br />
-    <?= $this->get('user_talk_list') ?><br /><hr />
-    <a name="wikipedia_talk"><b><?= $this->get('wikipedia_talk_count') ?></b> Wikipedia talk:</a><br />
-    <?= $this->get('wikipedia_talk_list') ?><br /><hr />
-    <a name="help_talk"><b><?= $this->get('help_talk_count') ?></b> Help talk:</a><br />
-    <?= $this->get('help_talk_list') ?>
-  </div>
-  <div class="rcol">
-    <a name="portal_talk"><b><?= $this->get('portal_talk_count') ?></b> Portal talk:</a><br />
-    <?= $this->get('portal_talk_list') ?><br /><hr />
-    <a name="template_talk"><b><?= $this->get('template_talk_count') ?></b> Template talk:</a><br />
-    <?= $this->get('template_talk_list') ?><br /><hr />
-    <a name="draft_talk"><b><?= $this->get('draft_talk_count') ?></b> Draft talk:</a><br />
-    <?= $this->get('draft_talk_list') ?><br /><hr />
-    <a name="module_talk"><b><?= $this->get('module_talk_count') ?></b> Module talk:</a><br />
-    <?= $this->get('module_talk_list') ?>
+  <div class="rcol" id="talk_2">
+    <b><?= $this->get('portal_talk_count') ?></b> Portal talk:<br /><?= $this->get('portal_talk_list') ?><br />
+    <hr />
+    <b><?= $this->get('template_talk_count') ?></b> Template talk:<br /><?= $this->get('template_talk_list') ?><br />
+    <hr />
+    <b><?= $this->get('draft_talk_count') ?></b> Draft talk:<br /><?= $this->get('draft_talk_list') ?><br />
+    <hr />
+    <b><?= $this->get('module_talk_count') ?></b> Module talk:<br /><?= $this->get('module_talk_list') ?>
   </div>
 </div>
 <hr />
