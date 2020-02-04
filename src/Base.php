@@ -22,7 +22,7 @@ use function urldecode;
 
 class Base
 {
-    const VERSION = '0.4.11';
+    const VERSION = '0.4.12';
 
     /**
      * @var bool - print verbose debug messages to STDOUT
@@ -160,6 +160,7 @@ class Base
 
     /**
      * set $this->topic to string from URL elements, or empty string
+     * @return bool
      */
     protected function setTopicFromUrl()
     {
@@ -179,7 +180,7 @@ class Base
         if (!is_string($this->topic) || !strlen($this->topic)) {
             $this->topic = '';
     
-            return;
+            return false;
         }
         // format query
         $this->topic = trim($this->topic);
@@ -187,7 +188,11 @@ class Base
         $this->topic = urldecode($this->topic);
         if (!is_string($this->topic) || !strlen($this->topic)) {
             $this->topic = '';
+
+            return false;
         }
+
+        return true;
     }
 
     protected function initFilesystem()
