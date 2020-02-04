@@ -5,10 +5,8 @@
  * Topic page template
  * @uses $this - \Attogram\Justrefs\Template
  */
-
 $this->include('html_head');
 $this->include('header');
-
 ?><div class="body">
 <h1><?= $this->get('h1') ?></h1>
 <hr />
@@ -97,5 +95,4 @@ $this->include('header');
 </div>
 <hr />
 </div><?php
-
 $this->include('footer');

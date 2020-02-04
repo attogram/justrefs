@@ -36,7 +36,7 @@ a:active {
   background-color:yellow;
   color:black;
 }
-.missing {
+.missing, a.missing {
   color:blueviolet;
 }
 .head {

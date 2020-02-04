@@ -5,9 +5,7 @@
  * Home Page template
  * @uses $this - \Attogram\Justrefs\Template
  */
-
 $this->include('html_head');
-
 ?><div class="body">
 <h1>Just Refs</h1>
 <ul>
@@ -42,5 +40,4 @@ $this->include('html_head');
 </ul>
 <br />
 </div><?php
-
 $this->include('footer');

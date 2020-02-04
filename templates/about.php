@@ -5,10 +5,8 @@
  * About Page template
  * @uses $this - \Attogram\Justrefs\Template
  */
-
 $this->include('html_head');
 $this->include('header');
-
 ?><div class="body">
 <h1>
     About <b><?= $this->get('name') ?></b> <small>v<?= $this->get('version') ?></small>
@@ -42,5 +40,4 @@ $this->include('header');
     &lt;<a href="https://github.com/attogram/justrefs">https://github.com/attogram/justrefs</a>&gt;
 <p>
 </div><?php
-
 $this->include('footer');
