@@ -1,8 +1,8 @@
 <?php
 /**
  * Just Refs - https://github.com/attogram/justrefs
- * Footer template
  *
+ * Footer template
  * @uses $this - \Attogram\Justrefs\Template
  */
 ?><footer>

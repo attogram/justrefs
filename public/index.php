@@ -6,7 +6,7 @@
  */
 $verbose = false;
 
-$vendor = '../vendor/autoload.php';
+$vendor = '..' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 if (!is_readable($vendor)) {
     exit('Site down for maintenance');
 }

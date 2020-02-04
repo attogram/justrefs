@@ -37,9 +37,11 @@ class Topic extends Base
         if ($this->data) {
             if (!empty($this->data['error'])) {
                 $this->error404('Topic Not Found', $this->topic);
+
                 return;
             }
             $this->display(); // show cached results
+
             return;
         }
 
@@ -50,9 +52,11 @@ class Topic extends Base
             $this->filesystem->set($this->topic, json_encode($this->data));
             if (!empty($this->data['error'])) {
                 $this->error404('Topic Not Found', $this->topic);
+
                 return;
             }
             $this->display(); // show api results
+
             return;
         }
 
@@ -126,8 +130,8 @@ class Topic extends Base
     private function initVars()
     {
         $namespaces = [
-            'main', 'talk',
-            'template', 'template_talk',
+            'main', 'talk', 'main_secondary',
+            'template', 'template_talk', 'template_secondary',
             'portal', 'portal_talk',
             'wikipedia', 'wikipedia_talk',
             'help', 'help_talk',
@@ -137,8 +141,6 @@ class Topic extends Base
             'refs',
             'missing',
             'exists',
-            'main_secondary',
-            'template_secondary',
         ];
         foreach ($namespaces as $index) {
             $this->vars[$index] = [];
@@ -202,18 +204,6 @@ class Topic extends Base
                 case '829': // Module_talk
                     $this->vars['module_talk'][] = $topic['*'];
                     break;
-                /*
-                case '6':  // File
-                case '7':  // File_talk
-                case '8':  // Mediawiki
-                case '9':  // Mediawiki_talk
-                case '14': // Category
-                case '15': // Category_talk
-                case '108': // Book
-                case '109': // Book_talk
-                case '710': // TimedText
-                case '711': // TimedText_talk
-                */
                 default:
                     break;
             }
