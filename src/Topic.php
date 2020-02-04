@@ -22,21 +22,21 @@ class Topic extends Base
     private $data = []; // topic data
     private $vars = []; // template variables
 
+    const ERROR_NOT_FOUND  = 'Topic Not Found';
+
     /**
      * Get a topic
+     * @return void
      */
     public function get()
     {
-        $this->setTopicFromUrl();
-        if (!$this->topic) {
-            $this->error404('Not Found');
+        if (!$this->setTopicFromUrl()) { // build topic from URL
+            $this->error404(self::ERROR_NOT_FOUND);
         }
 
-        // get topic from Cache
-        $this->setDataFromCache();
-        if ($this->data) {
+        if ($this->setDataFromCache()) { // get topic data from Cache
             if (!empty($this->data['error'])) {
-                $this->error404('Topic Not Found', $this->topic);
+                $this->error404(self::ERROR_NOT_FOUND, $this->topic);
 
                 return;
             }
@@ -45,13 +45,10 @@ class Topic extends Base
             return;
         }
 
-        // get topic from API
-        $this->setDataFromApi();
-        if ($this->data) {
-            // save results to cache
-            $this->filesystem->set($this->topic, json_encode($this->data));
-            if (!empty($this->data['error'])) {
-                $this->error404('Topic Not Found', $this->topic);
+        if ($this->setDataFromApi()) { // get topic data from API
+            $this->filesystem->set($this->topic, json_encode($this->data)); // save results to cache
+            if (!empty($this->data['error'])) { // if API reported an error
+                $this->error404(self::ERROR_NOT_FOUND, $this->topic);
 
                 return;
             }
@@ -60,11 +57,12 @@ class Topic extends Base
             return;
         }
 
-        $this->error404('Topic Not Found');
+        $this->error404(self::ERROR_NOT_FOUND);
     }
 
     /**
      * set $this->data to array from cached file, or empty array
+     * @return bool
      */
     private function setDataFromCache()
     {
@@ -72,11 +70,16 @@ class Topic extends Base
         $this->data = $this->filesystem->get($this->topic);
         if (!is_array($this->data)) {
             $this->data = [];
+
+            return false;
         }
+
+        return true;
     }
 
     /**
      * set $this->data to array from api response, or empty array
+     * @return bool
      */
     private function setDataFromApi()
     {
@@ -84,7 +87,11 @@ class Topic extends Base
         $this->data = $this->mediawiki->links($this->topic);
         if (!is_array($this->data)) {
             $this->data = [];
+
+            return false;
         }
+
+        return true;
     }
 
     private function display()
@@ -118,12 +125,9 @@ class Topic extends Base
         $this->setTemplateExists();
         $this->removeTemplateTopics();
         foreach (array_keys($this->vars) as $index) {
-            // set counts
-            $this->template->set($index . '_count', count($this->vars[$index]));
-            // sort var lists alphabetically
-            sort($this->vars[$index]);
-            // set html list
-            $this->template->set($index . '_list', $this->listify($index));
+            $this->template->set($index . '_count', count($this->vars[$index])); // set counts
+            sort($this->vars[$index]); // sort var lists alphabetically
+            $this->template->set($index . '_list', $this->listify($index)); // set html list
         }
     }
 
@@ -151,11 +155,9 @@ class Topic extends Base
     {
         foreach ($this->data['topics'] as $topic) {
             if (!isset($topic['exists'])) {
-                // page does not exist
-                $this->vars['missing'][] = $topic['*'];
+                $this->vars['missing'][] = $topic['*']; // page does not exist
             }
-            // @see https://en.wikipedia.org/wiki/Wikipedia:Namespace
-            switch ($topic['ns']) {
+            switch ($topic['ns']) { // @see https://en.wikipedia.org/wiki/Wikipedia:Namespace
                 case '0':  // Mainspace
                     $this->vars['main'][] = $topic['*'];
                     break;
@@ -273,8 +275,7 @@ class Topic extends Base
             }
             foreach ($templateData['topics'] as $exTopic) {
                 if ($exTopic['ns'] == '0' && in_array($exTopic['*'], $this->vars['main'])) {
-                    // main namespace only
-                    // remove this template topic from master topic list
+                    // main namespace only - remove this template topic from master topic list
                     unset($this->vars['main'][array_search($exTopic['*'], $this->vars['main'])]);
                     $this->vars['main_secondary'][] = $exTopic['*'];
                 }
