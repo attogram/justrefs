@@ -197,7 +197,7 @@ class Base
 
     protected function initFilesystem()
     {
-        $this->filesystem = new Filesystem($this->verbose);
+        $this->filesystem = (new FilesystemCache())->init();
     }
 
     protected function initMediawiki()

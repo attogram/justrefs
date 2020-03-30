@@ -23,7 +23,7 @@ class Refresh extends Base
             $this->error404('Refresh Topic Not Found');
         }
         $this->initFilesystem();
-        if (!$this->filesystem->exists($this->topic)) { // does cache file exist?
+        if (!$this->filesystem->has($this->topic)) { // does cache file exist?
             $this->error404('Cache File Not Found');
         }
         $this->template->set('title', 'Refresh');
@@ -53,7 +53,7 @@ class Refresh extends Base
         if (($one + $two) != $answer) {
             $this->error404('Invalid Answer');
         }
-        if (!$this->filesystem->delete($this->topic)) {
+        if (!$this->filesystem->forget($this->topic)) {
             $this->error404('Deletion Failed');
         }
         $this->template->include('html_head');
