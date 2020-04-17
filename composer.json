@@ -4,8 +4,11 @@
     "type": "project",
     "license": "MIT",
     "require": {
+        "php": "^7",
         "lib-curl": "*",
-        "attogram/router": "^4.1.2"
+        "attogram/router": "^4.1.3",
+        "illuminate/cache": "^7.2",
+        "illuminate/filesystem": "^7.2"
     },
     "autoload": {
         "psr-4": {

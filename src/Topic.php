@@ -34,6 +34,8 @@ class Topic extends Base
             $this->error404(self::ERROR_NOT_FOUND);
         }
 
+        $this->initFilesystem();
+        
         if ($this->setDataFromCache()) { // get topic data from Cache
             if (!empty($this->data['error'])) {
                 $this->error404(self::ERROR_NOT_FOUND, $this->topic);
@@ -45,8 +47,10 @@ class Topic extends Base
             return;
         }
 
-        if ($this->setDataFromApi()) { // get topic data from API
-            $this->filesystem->set($this->topic, json_encode($this->data)); // save results to cache
+        // If can get topic data from API
+        if ($this->setDataFromApi()) { 
+            // save results to cache for CACHE_TIME seconds
+            $this->filesystem->set($this->topic, json_encode($this->data), self::CACHE_TIME);
             if (!empty($this->data['error'])) { // if API reported an error
                 $this->error404(self::ERROR_NOT_FOUND, $this->topic);
 
@@ -66,7 +70,6 @@ class Topic extends Base
      */
     private function setDataFromCache()
     {
-        $this->initFilesystem();
         $this->data = $this->filesystem->get($this->topic);
         if (!is_array($this->data)) {
             $this->data = [];
@@ -97,15 +100,13 @@ class Topic extends Base
     private function display()
     {
         $this->setTemplateVars();
+    
         // set Extraction source url
         $this->template->set('source', $this->source . $this->encodeLink($this->data['title']));
+    
         // set Data and Cache age
-        $dataAge = '?';
-        $age = $this->filesystem->age($this->data['title']);
-        if ($age) {
-            $dataAge = gmdate('Y-m-d H:i:s', $age);
-        }
-        $this->template->set('dataAge', $dataAge);
+        $filesystemCache = new FilesystemCache();
+        $this->template->set('dataAge',  $filesystemCache->getAge($this->data['title']));
         $this->template->set('now', gmdate('Y-m-d H:i:s'));
         $this->template->set(
             'refresh',
@@ -215,7 +216,7 @@ class Topic extends Base
     private function setTemplateExists()
     {
         foreach ($this->vars['template'] as $item) {
-            if ($this->filesystem->exists($item)) {
+            if ($this->filesystem->has($item)) {
                 $this->vars['exists'][] = $item;
             }
         }

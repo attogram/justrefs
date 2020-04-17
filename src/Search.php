@@ -38,7 +38,7 @@ class Search extends Base
             $this->searchResults = $this->mediawiki->search($query);
             if ($this->searchResults) {
                 // Got API results - Save results to cache
-                $this->filesystem->set($cachedFile, json_encode($this->searchResults));
+                $this->filesystem->set($cachedFile, json_encode($this->searchResults), self::CACHE_TIME);
             }
         }
         $this->display();

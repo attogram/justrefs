@@ -22,7 +22,10 @@ use function urldecode;
 
 class Base
 {
-    const VERSION = '0.4.12';
+    const VERSION = '0.5.0';
+
+    /** Cache Time, in seconds.  4 days = 345600 seconds */
+    const CACHE_TIME = 345600;
 
     /**
      * @var bool - print verbose debug messages to STDOUT
@@ -40,7 +43,7 @@ class Base
     public $template;
 
     /**
-     * @var Attogram\Justrefs\Filesystem
+     * @var Attogram\Justrefs\FilesystemCache
      */
     protected $filesystem;
 
@@ -197,7 +200,7 @@ class Base
 
     protected function initFilesystem()
     {
-        $this->filesystem = new Filesystem($this->verbose);
+        $this->filesystem = (new FilesystemCache())->init();
     }
 
     protected function initMediawiki()
