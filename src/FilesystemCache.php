@@ -14,7 +14,7 @@ use Illuminate\Filesystem\Filesystem;
 
 class FilesystemCache
 {
-    const cacheDirectory = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'cache';
+    const CACHE_DIRECTORY = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'cache';
 
     /**
      * Initialize Cache object
@@ -24,10 +24,7 @@ class FilesystemCache
     public function init()
     {
         return new Repository(
-            new FileStore(
-                new Filesystem(),
-                self::cacheDirectory
-            )
+            new FileStore(new Filesystem(), self::CACHE_DIRECTORY)
         );
     }
 
@@ -41,7 +38,7 @@ class FilesystemCache
     {
         // build filename in Illuminate\Cache style
         $parts = array_slice(str_split($hash = sha1($key), 2), 0, 2);
-        $filename = self::cacheDirectory
+        $filename = self::CACHE_DIRECTORY
             . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $parts)
             . DIRECTORY_SEPARATOR . $hash;
 
