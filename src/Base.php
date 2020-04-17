@@ -24,6 +24,9 @@ class Base
 {
     const VERSION = '0.4.12';
 
+    /** Cache Time, in seconds.  4 days = 345600 seconds */
+    const CACHE_TIME = 345600;
+
     /**
      * @var bool - print verbose debug messages to STDOUT
      */

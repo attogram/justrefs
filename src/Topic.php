@@ -49,8 +49,8 @@ class Topic extends Base
 
         // If can get topic data from API
         if ($this->setDataFromApi()) { 
-            // save results to cache for X seconds
-            $this->filesystem->set($this->topic, json_encode($this->data), 30);
+            // save results to cache for CACHE_TIME seconds
+            $this->filesystem->set($this->topic, json_encode($this->data), self::CACHE_TIME);
             if (!empty($this->data['error'])) { // if API reported an error
                 $this->error404(self::ERROR_NOT_FOUND, $this->topic);
 
