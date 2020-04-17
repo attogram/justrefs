@@ -47,7 +47,7 @@ class FilesystemCache
 
         // If file does not exist...
         if (!is_readable($filename)) {
-            return gmdate ("NOT FOUND: Y-m-d H:i:s", now());
+            return gmdate("NOT FOUND: Y-m-d H:i:s", now());
         }
 
         // get inode change time of file
@@ -55,9 +55,9 @@ class FilesystemCache
 
         // if filemtime fails...
         if (!$lastModified) {
-            return gmdate ("ERROR: Y-m-d H:i:s", now());
+            return gmdate("ERROR: Y-m-d H:i:s", now());
         }
 
-        return gmdate ("Y-m-d H:i:s", $lastModified);
+        return gmdate("Y-m-d H:i:s", $lastModified);
     }
 }
