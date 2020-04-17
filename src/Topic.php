@@ -1,7 +1,6 @@
 <?php
 /**
  * Just Refs - https://github.com/attogram/justrefs
- *
  * Topic Class
  */
 declare(strict_types = 1);
@@ -51,7 +50,7 @@ class Topic extends Base
         }
 
         // If can get topic data from API
-        if ($this->setDataFromApi()) { 
+        if ($this->setDataFromApi()) {
             // save results to cache for CACHE_TIME seconds
             $this->filesystem->set($this->topic, json_encode($this->data), self::CACHE_TIME);
             if (!empty($this->data['error'])) { // if API reported an error
@@ -109,7 +108,7 @@ class Topic extends Base
     
         // set Data and Cache age
         $filesystemCache = new FilesystemCache();
-        $this->template->set('dataAge',  $filesystemCache->getAge($this->data['title']));
+        $this->template->set('dataAge', $filesystemCache->getAge($this->data['title']));
         $this->template->set('now', gmdate('Y-m-d H:i:s'));
         $this->template->set(
             'refresh',

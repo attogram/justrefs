@@ -1,7 +1,6 @@
 <?php
 /**
  * Just Refs - https://github.com/attogram/justrefs
- *
  * Search Class
  */
 declare(strict_types = 1);
