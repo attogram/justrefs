@@ -168,18 +168,10 @@ class Base
     protected function setTopicFromUrl()
     {
         $this->topic = $this->router->getVar(0);
-        if ($this->router->getVar(1)) {
-            $this->topic .= '/' . $this->router->getVar(1);
-        }
-        if ($this->router->getVar(2)) {
-            $this->topic .= '/' . $this->router->getVar(2);
-        }
-        if ($this->router->getVar(3)) {
-            $this->topic .= '/' . $this->router->getVar(3);
-        }
-        if ($this->router->getVar(4)) {
-            $this->topic .= '/' . $this->router->getVar(4);
-        }
+        $this->topic .= !empty($this->router->getVar(1)) ? '/' . $this->router->getVar(1) : '';
+        $this->topic .= !empty($this->router->getVar(2)) ? '/' . $this->router->getVar(2) : '';
+        $this->topic .= !empty($this->router->getVar(3)) ? '/' . $this->router->getVar(3) : '';
+        $this->topic .= !empty($this->router->getVar(4)) ? '/' . $this->router->getVar(4) : '';
 
         if (!is_string($this->topic) || !strlen($this->topic)) {
             $this->topic = '';

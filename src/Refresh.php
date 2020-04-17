@@ -53,7 +53,7 @@ class Refresh extends Base
         if (($one + $two) != $answer) {
             $this->error404('Invalid Answer');
         }
-        if (!$this->filesystem->forget($this->topic)) {
+        if (!$this->filesystem->forget($this->topic)) { // @TODO - forget not working?
             $this->error404('Deletion Failed');
         }
         $this->template->include('html_head');
