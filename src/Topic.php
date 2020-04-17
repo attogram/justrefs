@@ -19,10 +19,13 @@ use function substr;
 
 class Topic extends Base
 {
-    private $data = []; // topic data
-    private $vars = []; // template variables
-
     const ERROR_NOT_FOUND  = 'Topic Not Found';
+
+    /** @var array $data - topic data */
+    private $data = [];
+
+    /** @var array $vars - template variables */
+    private $vars = [];
 
     /**
      * Get a topic
@@ -135,17 +138,10 @@ class Topic extends Base
     private function initVars()
     {
         $namespaces = [
-            'main', 'talk', 'main_secondary',
-            'template', 'template_talk', 'template_secondary',
-            'portal', 'portal_talk',
-            'wikipedia', 'wikipedia_talk',
-            'help', 'help_talk',
-            'module', 'module_talk',
-            'draft', 'draft_talk',
-            'user', 'user_talk',
-            'refs',
-            'missing',
-            'exists',
+            'main', 'talk', 'main_secondary', 'template', 'template_talk', 'template_secondary',
+            'portal', 'portal_talk', 'wikipedia', 'wikipedia_talk', 'help', 'help_talk',
+            'module', 'module_talk', 'draft', 'draft_talk', 'user', 'user_talk',
+            'refs', 'missing', 'exists',
         ];
         foreach ($namespaces as $index) {
             $this->vars[$index] = [];
@@ -297,13 +293,11 @@ class Topic extends Base
         }
         $html = '<ol>';
         foreach ($this->vars[$index] as $item) {
-            if ($index == 'refs') {
-                // Link to external reference
+            if ($index == 'refs') { // Link to external reference
                 $html .= '<li><a href="' . $item . '" target="_blank">' . $item . '</a></li>';
                 continue;
             }
-            if (in_array($item, $this->vars['missing'])) {
-                // non-existing page
+            if (in_array($item, $this->vars['missing'])) { // non-existing page
                 $html .= '<li><span class="red">' . $item . '</span></li>';
                 continue;
             }
