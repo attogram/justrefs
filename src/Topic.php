@@ -139,8 +139,7 @@ class Topic extends Base
         $namespaces = [
             'main', 'talk', 'main_secondary', 'template', 'template_talk', 'template_secondary',
             'portal', 'portal_talk', 'wikipedia', 'wikipedia_talk', 'help', 'help_talk',
-            'module', 'module_talk', 'draft', 'draft_talk', 'user', 'user_talk',
-            'refs', 'missing', 'exists',
+            'module', 'module_talk', 'draft', 'draft_talk', 'user', 'user_talk', 'refs', 'missing', 'exists',
         ];
         foreach ($namespaces as $index) {
             $this->vars[$index] = [];
@@ -252,22 +251,18 @@ class Topic extends Base
 
     private function removeTemplateTopics()
     {
-        if (empty($this->vars['main'])) {
-            return;
-        }
-        if (empty($this->vars['template']) && $this->vars['template_secondary']) {
+        if (empty($this->vars['main'])
+            || (empty($this->vars['template']) && $this->vars['template_secondary'])
+        ) {
             return;
         }
         foreach ($this->vars['template'] as $template) {
-            if ($template == $this->topic) {
-                continue; // self
-            }
-            if (!in_array($template, $this->vars['exists'])) {
-                continue; // template not cached
+            if ($template == $this->topic || (!in_array($template, $this->vars['exists']))) {
+                continue; // error: is self, or template not cached
             }
             $templateData = $this->filesystem->get($template);
             if (empty($templateData['topics']) || !is_array($templateData['topics'])) {
-                continue; // error malformed data
+                continue; // error: malformed data
             }
             foreach ($templateData['topics'] as $exTopic) {
                 if ($exTopic['ns'] == '0' && in_array($exTopic['*'], $this->vars['main'])) {

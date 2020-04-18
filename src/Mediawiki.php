@@ -58,9 +58,8 @@ class Mediawiki extends Base
         ) {
             $result['title'] = $query;
             $result['error'] = true;
-            //$this->error('links: 404 NOT FOUND: ' . $query);
 
-            return $result;
+            return $result; // 404 Not Found
         }
         // set title
         $result['title'] = $data['parse']['title'];
