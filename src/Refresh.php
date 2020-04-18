@@ -52,7 +52,12 @@ class Refresh extends Base
         if (($one + $two) != $answer) {
             $this->error404('Invalid Answer');
         }
-        if (!$this->filesystem->forget($this->topic)) { // @TODO - forget not working?
+        $this->deleteCacheFile();
+    }
+
+    private function deleteCacheFile()
+    {
+        if (!$this->filesystem->forget($this->topic)) {
             $this->error404('Deletion Failed');
         }
         $this->template->include('html_head');
@@ -80,8 +85,7 @@ class Refresh extends Base
             . '<input type="hidden" name="c" value="' . time() . '">'
             . "If $letterOne = $numOne and $letterTwo = $numTwo then $letterOne + $letterTwo = "
             . '<input name="d" value="" size="4">'
-            . '<br /><br /><input type="submit" value="    Delete Cache    ">'
-            . '</form><br /></div>';
+            . '<br /><br /><input type="submit" value="    Delete Cache    "></form><br /></div>';
         $this->template->include('footer');
     }
 }
