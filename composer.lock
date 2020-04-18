@@ -4,25 +4,28 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "02a06d8ca3a75048363626aa16a07a63",
+    "content-hash": "33f7535c3a2415212b1473f4731593a1",
     "packages": [
         {
             "name": "attogram/file-cache-cleaner",
-            "version": "v1.0.2",
+            "version": "v2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/attogram/file-cache-cleaner.git",
-                "reference": "f26e60bac737b32fc2b4c51f33dd86a017984d7c"
+                "reference": "27585cdbb92a03fec9fc7d6fe59f12c8a76ec561"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/attogram/file-cache-cleaner/zipball/f26e60bac737b32fc2b4c51f33dd86a017984d7c",
-                "reference": "f26e60bac737b32fc2b4c51f33dd86a017984d7c",
+                "url": "https://api.github.com/repos/attogram/file-cache-cleaner/zipball/27585cdbb92a03fec9fc7d6fe59f12c8a76ec561",
+                "reference": "27585cdbb92a03fec9fc7d6fe59f12c8a76ec561",
                 "shasum": ""
             },
             "require": {
                 "php": "^7"
             },
+            "bin": [
+                "bin/file-cache-cleaner"
+            ],
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -34,7 +37,7 @@
                 "MIT"
             ],
             "description": "Delete expired Laravel cache files",
-            "time": "2020-04-17T17:35:52+00:00"
+            "time": "2020-04-18T15:25:43+00:00"
         },
         {
             "name": "attogram/router",
