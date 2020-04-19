@@ -265,12 +265,20 @@ class Topic extends Base
             if (empty($templateData[self::TOPICS]) || !is_array($templateData[self::TOPICS])) {
                 continue; // error: malformed data
             }
-            foreach ($templateData[self::TOPICS] as $exTopic) {
-                if ($exTopic[self::NS] == '0' && in_array($exTopic[self::ASTERISK], $this->vars[self::MAIN])) {
-                    // main namespace only - remove this template topic from master topic list
-                    unset($this->vars[self::MAIN][array_search($exTopic[self::ASTERISK], $this->vars[self::MAIN])]);
-                    $this->vars[self::MAIN_SECONDARY][] = $exTopic[self::ASTERISK];
-                }
+            $this->unsetDupeTopics($templateData[self::TOPICS]);
+        }
+    }
+
+    /**
+     * @param array $topics
+     */
+    private function unsetDupeTopics(array $topics)
+    {
+        foreach ($topics as $exTopic) {
+            if ($exTopic[self::NS] == '0' && in_array($exTopic[self::ASTERISK], $this->vars[self::MAIN])) {
+                // main namespace only - remove this template topic from master topic list
+                unset($this->vars[self::MAIN][array_search($exTopic[self::ASTERISK], $this->vars[self::MAIN])]);
+                $this->vars[self::MAIN_SECONDARY][] = $exTopic[self::ASTERISK];
             }
         }
     }

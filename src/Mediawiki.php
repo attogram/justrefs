@@ -64,11 +64,17 @@ class Mediawiki extends Base
         // set title
         $result[self::TITLE] = $data[self::PARSE][self::TITLE];
         // set reference links
-        $result[self::REFS] = isset($data[self::PARSE][self::EXTERNALLINKS]) ? $data[self::PARSE][self::EXTERNALLINKS]: [];
+        $result[self::REFS] = isset($data[self::PARSE][self::EXTERNALLINKS])
+            ? $data[self::PARSE][self::EXTERNALLINKS]
+            : [];
         // set related topics
-        $result[self::TOPICS] = isset($data[self::PARSE][self::LINKS]) ? $data[self::PARSE][self::LINKS] : [];
+        $result[self::TOPICS] = isset($data[self::PARSE][self::LINKS])
+            ? $data[self::PARSE][self::LINKS]
+            : [];
         // set templates
-        $result[self::TEMPLATES] = isset($data[self::PARSE][self::TEMPLATES]) ? $data[self::PARSE][self::TEMPLATES] : [];
+        $result[self::TEMPLATES] = isset($data[self::PARSE][self::TEMPLATES])
+            ? $data[self::PARSE][self::TEMPLATES]
+            : [];
 
         return $result;
     }
