@@ -46,10 +46,7 @@ class Refresh extends Base
         }
         $one = $this->router->getPost('a');
         $two = $this->router->getPost('b');
-        if (!strlen($one) || !strlen($two)) {
-            $this->error404('Invalid Request');
-        }
-        if (($one + $two) != $answer) {
+        if (!strlen($one) || !strlen($two) || (($one + $two) != $answer)) {
             $this->error404('Invalid Answer');
         }
         $this->deleteCacheFile();
