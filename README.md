@@ -6,6 +6,12 @@ Live Demo: <https://getitdaily.com/justrefs/>
 
 Github Repository: <https://github.com/attogram/justrefs>
 
+[![Maintainability](https://api.codeclimate.com/v1/badges/c38dead93fac4b544a9e/maintainability)](https://codeclimate.com/github/attogram/justrefs/maintainability)
+[![Latest Stable Version](https://poser.pugx.org/attogram/justrefs/v/stable)](https://packagist.org/packages/attogram/justrefs)
+[![Total Downloads](https://poser.pugx.org/attogram/justrefs/downloads)](https://packagist.org/packages/attogram/justrefs)
+[![License](https://poser.pugx.org/attogram/justrefs/license)](https://packagist.org/packages/attogram/justrefs)
+
+
 ## Goal
 
 The goal of the **Just Refs** project is to help students and researchers
