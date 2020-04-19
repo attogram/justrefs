@@ -55,7 +55,7 @@ $this->include('header');
     <b><?= $this->get('help_count') ?></b> Help:<br /><?= $this->get('help_list') ?>
     <hr />
     <a name="wikipedia"></a>
-    <b><?= $this->get('wikipedia_count') ?></b> Wikipedia:<br /><?= $this->get('wikipedial_list') /* @TODO not working? */ ?>
+    <b><?= $this->get('wikipedia_count') ?></b> Wikipedia:<br /><?= $this->get('wikipedia_list') ?>
   </div>
   <div class="rcol" id="template_secondary">
     <b><?= $this->get('template_secondary_count') ?></b> Secondary-Templates:
