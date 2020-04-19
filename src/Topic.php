@@ -261,7 +261,7 @@ class Topic extends Base
             if ($template == $this->topic || (!in_array($template, $this->vars[self::EXISTS]))) {
                 continue; // error: is self, or template not cached
             }
-            $templateData = $this->filesystem->get($template);
+            $templateData = json_decode($this->filesystem->get($template), true);
             if (empty($templateData[self::TOPICS]) || !is_array($templateData[self::TOPICS])) {
                 continue; // error: malformed data
             }
