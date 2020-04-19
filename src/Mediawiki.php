@@ -53,8 +53,8 @@ class Mediawiki extends Base
         }
         $result = [];
         if (isset($data['error'])
-            || !isset($data['parse']['title'])
-            || empty($data['parse']['title'])
+            || !isset($data[self::PARSE]['title'])
+            || empty($data[self::PARSE]['title'])
         ) {
             $result['title'] = $query;
             $result['error'] = true;
@@ -62,13 +62,13 @@ class Mediawiki extends Base
             return $result; // 404 Not Found
         }
         // set title
-        $result['title'] = $data['parse']['title'];
+        $result['title'] = $data[self::PARSE]['title'];
         // set reference links
-        $result['refs'] = isset($data['parse']['externallinks']) ? $data['parse']['externallinks']: [];
+        $result['refs'] = isset($data[self::PARSE]['externallinks']) ? $data[self::PARSE]['externallinks']: [];
         // set related topics
-        $result['topics'] = isset($data['parse']['links']) ? $data['parse']['links'] : [];
+        $result['topics'] = isset($data[self::PARSE]['links']) ? $data[self::PARSE]['links'] : [];
         // set templates
-        $result['templates'] = isset($data['parse']['templates']) ? $data['parse']['templates'] : [];
+        $result['templates'] = isset($data[self::PARSE]['templates']) ? $data[self::PARSE]['templates'] : [];
 
         return $result;
     }
@@ -81,14 +81,14 @@ class Mediawiki extends Base
     {
         $data = $this->getApi($this->api . $this->apiSearch . urlencode($query));
         if (!$data || !is_array($data) || empty($data['query'])
-            || empty($data['query']['search']) || !is_array($data['query']['search'])
+            || empty($data['query'][self::SEARCH]) || !is_array($data['query'][self::SEARCH])
         ) {
             $this->error('search: query failed');
 
             return false;
         }
         $results = [];
-        foreach ($data['query']['search'] as $topic) {
+        foreach ($data['query'][self::SEARCH] as $topic) {
             if (!isset($topic['title']) || !is_string($topic['title'])) {
                 continue;
             }

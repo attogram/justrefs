@@ -11,7 +11,6 @@ Github Repository: <https://github.com/attogram/justrefs>
 [![Total Downloads](https://poser.pugx.org/attogram/justrefs/downloads)](https://packagist.org/packages/attogram/justrefs)
 [![License](https://poser.pugx.org/attogram/justrefs/license)](https://packagist.org/packages/attogram/justrefs)
 
-
 ## Goal
 
 The goal of the **Just Refs** project is to help students and researchers
