@@ -21,7 +21,7 @@ use function urldecode;
 
 class Base
 {
-    const VERSION = '0.5.0';
+    const VERSION = '0.5.1';
 
     /** Cache Time, in seconds.  4 days = 345600 seconds */
     const CACHE_TIME = 345600;
