@@ -15,11 +15,6 @@ use function trim;
 
 class JustRefs extends Base
 {
-    const ABOUT = 'about';
-    const HOME = 'home';
-    const REFERSH = 'refresh';
-    const TOPIC = 'topic';
-
     /**
      * @var string - the current query
      */

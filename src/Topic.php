@@ -104,18 +104,18 @@ class Topic extends Base
         $this->setTemplateVars();
     
         // set Extraction source url
-        $this->template->set('source', $this->source . $this->encodeLink($this->data['title']));
+        $this->template->set('source', $this->source . $this->encodeLink($this->data[self::TITLE]));
     
         // set Data and Cache age
         $filesystemCache = new FilesystemCache();
-        $this->template->set('dataAge', $filesystemCache->getAge($this->data['title']));
+        $this->template->set('dataAge', $filesystemCache->getAge($this->data[self::TITLE]));
         $this->template->set('now', gmdate('Y-m-d H:i:s'));
         $this->template->set(
             'refresh',
-            $this->template->get('home') . 'refresh/' . $this->encodeLink($this->data['title'])
+            $this->template->get('home') . 'refresh/' . $this->encodeLink($this->data[self::TITLE])
         );
-        $this->template->set('h1', $this->data['title']);
-        $this->template->set('title', $this->data['title'] . ' - ' . $this->siteName);
+        $this->template->set('h1', $this->data[self::TITLE]);
+        $this->template->set(self::TITLE, $this->data[self::TITLE] . ' - ' . $this->siteName);
         $this->template->include('topic');
     }
 
@@ -137,9 +137,9 @@ class Topic extends Base
     private function initVars()
     {
         $namespaces = [
-            'main', 'talk', 'main_secondary', 'template', 'template_talk', 'template_secondary',
+            self::MAIN, self::TALK, 'main_secondary', self::TEMPLATE, 'template_talk', self::TEMPLATE_SECONDARY,
             'portal', 'portal_talk', 'wikipedia', 'wikipedia_talk', 'help', 'help_talk',
-            'module', 'module_talk', 'draft', 'draft_talk', 'user', 'user_talk', 'refs', 'missing', 'exists',
+            self::MODULE, 'module_talk', 'draft', 'draft_talk', self::USER, 'user_talk', 'refs', self::MISSING, self::EXISTS,
         ];
         foreach ($namespaces as $index) {
             $this->vars[$index] = [];
@@ -148,19 +148,19 @@ class Topic extends Base
 
     private function setNamespaces()
     {
-        foreach ($this->data['topics'] as $topic) {
-            if (!isset($topic['exists'])) {
-                $this->vars['missing'][] = $topic['*']; // page does not exist
+        foreach ($this->data[self::TOPICS] as $topic) {
+            if (!isset($topic[self::EXISTS])) {
+                $this->vars[self::MISSING][] = $topic['*']; // page does not exist
             }
             switch ($topic['ns']) { // @see https://en.wikipedia.org/wiki/Wikipedia:Namespace
                 case '0':  // Mainspace
-                    $this->vars['main'][] = $topic['*'];
+                    $this->vars[self::MAIN][] = $topic['*'];
                     break;
                 case '1':  // Talk
-                    $this->vars['talk'][] = $topic['*'];
+                    $this->vars[self::TALK][] = $topic['*'];
                     break;
                 case '2':  // User
-                    $this->vars['user'][] = $topic['*'];
+                    $this->vars[self::USER][] = $topic['*'];
                     break;
                 case '3':  // User_talk
                     $this->vars['user_talk'][] = $topic['*'];
@@ -172,7 +172,7 @@ class Topic extends Base
                     $this->vars['wikipedia_talk'][] = $topic['*'];
                     break;
                 case '10': // Template
-                    $this->vars['template'][] = $topic['*'];
+                    $this->vars[self::TEMPLATE][] = $topic['*'];
                     break;
                 case '11': // Template_talk
                     $this->vars['template_talk'][] = $topic['*'];
@@ -196,7 +196,7 @@ class Topic extends Base
                     $this->vars['draft_talk'][] = $topic['*'];
                     break;
                 case '828': // Module
-                    $this->vars['module'][] = $topic['*'];
+                    $this->vars[self::MODULE][] = $topic['*'];
                     break;
                 case '829': // Module_talk
                     $this->vars['module_talk'][] = $topic['*'];
@@ -209,9 +209,9 @@ class Topic extends Base
 
     private function setTemplateExists()
     {
-        foreach ($this->vars['template'] as $item) {
+        foreach ($this->vars[self::TEMPLATE] as $item) {
             if ($this->filesystem->has($item)) {
-                $this->vars['exists'][] = $item;
+                $this->vars[self::EXISTS][] = $item;
             }
         }
     }
@@ -232,16 +232,16 @@ class Topic extends Base
             switch ($item['ns']) {
                 case '0': // Main
                     if ($item['*'] != $this->topic) {
-                        $this->vars['main'][] = $item['*'];
+                        $this->vars[self::MAIN][] = $item['*'];
                     }
                     break;
                 case '10': // Template:
-                    if (!in_array($item['*'], $this->vars['template'])) {
-                        $this->vars['template_secondary'][] = $item['*'];
+                    if (!in_array($item['*'], $this->vars[self::TEMPLATE])) {
+                        $this->vars[self::TEMPLATE_SECONDARY][] = $item['*'];
                     }
                     break;
                 case '828': // Module:
-                    $this->vars['module'][] = $item['*'];
+                    $this->vars[self::MODULE][] = $item['*'];
                     break;
                 default:
                     break;
@@ -251,23 +251,23 @@ class Topic extends Base
 
     private function removeTemplateTopics()
     {
-        if (empty($this->vars['main'])
-            || (empty($this->vars['template']) && $this->vars['template_secondary'])
+        if (empty($this->vars[self::MAIN])
+            || (empty($this->vars[self::TEMPLATE]) && $this->vars[self::TEMPLATE_SECONDARY])
         ) {
             return;
         }
-        foreach ($this->vars['template'] as $template) {
-            if ($template == $this->topic || (!in_array($template, $this->vars['exists']))) {
+        foreach ($this->vars[self::TEMPLATE] as $template) {
+            if ($template == $this->topic || (!in_array($template, $this->vars[self::EXISTS]))) {
                 continue; // error: is self, or template not cached
             }
             $templateData = $this->filesystem->get($template);
-            if (empty($templateData['topics']) || !is_array($templateData['topics'])) {
+            if (empty($templateData[self::TOPICS]) || !is_array($templateData[self::TOPICS])) {
                 continue; // error: malformed data
             }
-            foreach ($templateData['topics'] as $exTopic) {
-                if ($exTopic['ns'] == '0' && in_array($exTopic['*'], $this->vars['main'])) {
+            foreach ($templateData[self::TOPICS] as $exTopic) {
+                if ($exTopic['ns'] == '0' && in_array($exTopic['*'], $this->vars[self::MAIN])) {
                     // main namespace only - remove this template topic from master topic list
-                    unset($this->vars['main'][array_search($exTopic['*'], $this->vars['main'])]);
+                    unset($this->vars[self::MAIN][array_search($exTopic['*'], $this->vars[self::MAIN])]);
                     $this->vars['main_secondary'][] = $exTopic['*'];
                 }
             }
@@ -280,7 +280,7 @@ class Topic extends Base
      */
     private function listify($index)
     {
-        if (in_array($index, ['exists', 'missing']) // skip internal-usage vars
+        if (in_array($index, [self::EXISTS, self::MISSING]) // skip internal-usage vars
             || empty($this->vars[$index]) // Error - index not found, or index empty
         ) {
             return '&nbsp;';
@@ -291,13 +291,13 @@ class Topic extends Base
                 $html .= '<li><a href="' . $item . '" target="_blank">' . $item . '</a></li>';
                 continue;
             }
-            if (in_array($item, $this->vars['missing'])) { // non-existing page
+            if (in_array($item, $this->vars[self::MISSING])) { // non-existing page
                 $html .= '<li><span class="red">' . $item . '</span></li>';
                 continue;
             }
             // Link to internal page
             $class = '';
-            if ($index == 'template' && !in_array($item, $this->vars['exists'])) {
+            if ($index == self::TEMPLATE && !in_array($item, $this->vars[self::EXISTS])) {
                 // template is not loaded, thus possible that secondary-topics not all set
                 $class = ' class="missing"';
             }

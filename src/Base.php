@@ -26,6 +26,41 @@ class Base
     /** Cache Time, in seconds.  4 days = 345600 seconds */
     const CACHE_TIME = 345600;
 
+    /** key strings */
+    const ABOUT = 'about';
+    const DRAFT = 'draft';
+    const DRAFT_TALK = 'draft_talk';
+    const EXISTS = 'exists';
+    const EXTERNALLINKS = 'externallinks';
+    const HELP = 'help';
+    const HELP_TALK = 'help_talk';
+    const HOME = 'home';
+    const LINKS = 'links';
+    const MAIN = 'main';
+    const MAIN_SECONDARY = 'main_secondary';
+    const MISSING = 'missing';
+    const MODULE = 'module';
+    const MODULE_TALK = 'module_talk';
+    const PARSE = 'parse';
+    const PORTAL = 'portal';
+    const PORTAL_TALK = 'portal_talk';
+    const QUERY = 'query';
+    const REFRESH = 'refresh';
+    const REFS = 'refs';
+    const SEARCH = 'search';
+    const TALK = 'talk';
+    const TEMPLATE = 'template';
+    const TEMPLATE_TALK = 'template_talk';
+    const TEMPLATE_SECONDARY = 'template_secondary';
+    const TITLE = 'title';
+    const TOPIC = 'topic';
+    const TOPICS = 'topics';
+    const TEMPLATES = 'templates';
+    const USER = 'user';
+    const USER_TALK = 'user_talk';
+    const WIKIPEDIA = 'wikipedia';
+    const WIKIPEDIA_TALK = 'wikipedia_talk';
+
     /**
      * @var bool - print verbose debug messages to STDOUT
      */
