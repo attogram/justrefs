@@ -41,22 +41,22 @@ class JustRefs extends Base
     private function match($match)
     {
         switch ($match) {
-            case 'topic':
+            case self::TOPIC:
                 (new Topic($this->verbose, $this->router, $this->template))->get();
                 break;
-            case 'home':
+            case self::HOME:
                 $this->setQueryFromGet();
                 if (empty($this->query)) {
-                    $this->template->include('home');
+                    $this->template->include(self::HOME);
                     break;
                 }
                 (new Search($this->verbose, null, $this->template))->get($this->query);
                 break;
-            case 'about':
+            case self::ABOUT:
                 $this->template->set('title', 'About this site');
-                $this->template->include('about');
+                $this->template->include(self::ABOUT);
                 break;
-            case 'refresh':
+            case self::REFRESH:
                 (new Refresh($this->verbose, $this->router, $this->template))->get();
                 break;
             default:
@@ -67,24 +67,24 @@ class JustRefs extends Base
     private function initRouter()
     {
         $this->router = new Router();
-        $this->router->allow('/', 'home');
-        $this->router->allow('/r/?', 'topic');
-        $this->router->allow('/r/?/?', 'topic');
-        $this->router->allow('/r/?/?/?', 'topic');
-        $this->router->allow('/r/?/?/?/?', 'topic');
-        $this->router->allow('/about', 'about');
-        $this->router->allow('/refresh', 'refresh');
-        $this->router->allow('/refresh/?', 'refresh');
-        $this->router->allow('/refresh/?/?', 'refresh');
-        $this->router->allow('/refresh/?/?/?', 'refresh');
-        $this->router->allow('/refresh/?/?/?/?', 'refresh');
+        $this->router->allow('/', self::HOME);
+        $this->router->allow('/r/?', self::TOPIC);
+        $this->router->allow('/r/?/?', self::TOPIC);
+        $this->router->allow('/r/?/?/?', self::TOPIC);
+        $this->router->allow('/r/?/?/?/?', self::TOPIC);
+        $this->router->allow('/about', self::ABOUT);
+        $this->router->allow('/refresh', self::REFRESH);
+        $this->router->allow('/refresh/?', self::REFRESH);
+        $this->router->allow('/refresh/?/?', self::REFRESH);
+        $this->router->allow('/refresh/?/?/?', self::REFRESH);
+        $this->router->allow('/refresh/?/?/?/?', self::REFRESH);
     }
 
     private function initTemplate()
     {
         $this->template = new Template($this->verbose);
         $this->template->timer = $this->timer;
-        $this->template->set('home', $this->router->getHome());
+        $this->template->set(self::HOME, $this->router->getHome());
         $this->template->set('title', $this->siteName);
         $this->template->set('name', $this->siteName);
         $this->template->set('version', self::VERSION);
