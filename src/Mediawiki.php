@@ -53,22 +53,22 @@ class Mediawiki extends Base
         }
         $result = [];
         if (isset($data['error'])
-            || !isset($data[self::PARSE]['title'])
-            || empty($data[self::PARSE]['title'])
+            || !isset($data[self::PARSE][self::TITLE])
+            || empty($data[self::PARSE][self::TITLE])
         ) {
-            $result['title'] = $query;
+            $result[self::TITLE] = $query;
             $result['error'] = true;
 
             return $result; // 404 Not Found
         }
         // set title
-        $result['title'] = $data[self::PARSE]['title'];
+        $result[self::TITLE] = $data[self::PARSE][self::TITLE];
         // set reference links
-        $result['refs'] = isset($data[self::PARSE]['externallinks']) ? $data[self::PARSE]['externallinks']: [];
+        $result[self::REFS] = isset($data[self::PARSE][self::EXTERNALLINKS]) ? $data[self::PARSE][self::EXTERNALLINKS]: [];
         // set related topics
-        $result['topics'] = isset($data[self::PARSE]['links']) ? $data[self::PARSE]['links'] : [];
+        $result[self::TOPICS] = isset($data[self::PARSE][self::LINKS]) ? $data[self::PARSE][self::LINKS] : [];
         // set templates
-        $result['templates'] = isset($data[self::PARSE]['templates']) ? $data[self::PARSE]['templates'] : [];
+        $result[self::TEMPLATES] = isset($data[self::PARSE][self::TEMPLATES]) ? $data[self::PARSE][self::TEMPLATES] : [];
 
         return $result;
     }
@@ -80,19 +80,19 @@ class Mediawiki extends Base
     public function search($query)
     {
         $data = $this->getApi($this->api . $this->apiSearch . urlencode($query));
-        if (!$data || !is_array($data) || empty($data['query'])
-            || empty($data['query'][self::SEARCH]) || !is_array($data['query'][self::SEARCH])
+        if (!$data || !is_array($data) || empty($data[self::QUERY])
+            || empty($data[self::QUERY][self::SEARCH]) || !is_array($data[self::QUERY][self::SEARCH])
         ) {
             $this->error('search: query failed');
 
             return false;
         }
         $results = [];
-        foreach ($data['query'][self::SEARCH] as $topic) {
-            if (!isset($topic['title']) || !is_string($topic['title'])) {
+        foreach ($data[self::QUERY][self::SEARCH] as $topic) {
+            if (!isset($topic[self::TITLE]) || !is_string($topic[self::TITLE])) {
                 continue;
             }
-            $results[] = $topic['title'];
+            $results[] = $topic[self::TITLE];
         }
 
         return $results;
