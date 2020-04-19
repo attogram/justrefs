@@ -28,6 +28,7 @@ class Base
 
     /** key strings */
     const ABOUT = 'about';
+    const ASTERISK = '*';
     const DRAFT = 'draft';
     const DRAFT_TALK = 'draft_talk';
     const EXISTS = 'exists';
@@ -41,6 +42,7 @@ class Base
     const MISSING = 'missing';
     const MODULE = 'module';
     const MODULE_TALK = 'module_talk';
+    const NS = 'ns';
     const PARSE = 'parse';
     const PORTAL = 'portal';
     const PORTAL_TALK = 'portal_talk';

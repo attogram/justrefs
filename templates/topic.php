@@ -17,10 +17,10 @@ $this->include('header');
     <a href="#template"><b><?= $this->get('template_count') ?></b> Templates</a>
   </li>
   <li><a href="#template"><b><?= $this->get('portal_count') ?></b> Portals</a>,
-    <a href="#help"><b><?= $this->get('wikipedia_count') ?></b> Wikipedia</a>,
+    <a href="#wikipedia"><b><?= $this->get('wikipedia_count') ?></b> Wikipedia</a>,
     <a href="#help"><b><?= $this->get('help_count') ?></b> Help</a>,
     <a href="#template_secondary"><b><?= $this->get('template_secondary_count') ?></b> Secondary-Templates</a>,
-    <a href="#template_secondary"><b><?= $this->get('module_count') ?></b> Modules</a>,
+    <a href="#module"><b><?= $this->get('module_count') ?></b> Modules</a>,
     <a href="#draft"><b><?= $this->get('draft_count') ?></b> Drafts</a>,
     <a href="#user"><b><?= $this->get('user_count') ?></b> Users</a>
   </li>
@@ -54,12 +54,14 @@ $this->include('header');
   <div class="lcol" id="help">
     <b><?= $this->get('help_count') ?></b> Help:<br /><?= $this->get('help_list') ?>
     <hr />
-    <b><?= $this->get('wikipedia_count') ?></b> Wikipedia:<br /><?= $this->get('wikipedial_list') ?>
+    <a name="wikipedia"></a>
+    <b><?= $this->get('wikipedia_count') ?></b> Wikipedia:<br /><?= $this->get('wikipedial_list') /* @TODO not working? */ ?>
   </div>
   <div class="rcol" id="template_secondary">
     <b><?= $this->get('template_secondary_count') ?></b> Secondary-Templates:
     <br /><?= $this->get('template_secondary_list') ?><br />
     <hr />
+    <a name="module"></a>
     <b><?= $this->get('module_count') ?></b> Modules:<br /><?= $this->get('module_list') ?>
   </div>
 </div>
