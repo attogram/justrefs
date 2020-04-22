@@ -7,6 +7,10 @@ declare(strict_types = 1);
 
 namespace Attogram\Justrefs;
 
+use Illuminate\Cache\FileStore;
+use Illuminate\Cache\Repository;
+use Illuminate\Filesystem\Filesystem;
+
 use function get_class;
 use function header;
 use function htmlentities;
@@ -21,7 +25,10 @@ use function urldecode;
 
 class Base
 {
-    const VERSION = '0.7.0';
+    const VERSION = '0.8.0';
+
+    /** Cache Directory */
+    const CACHE_DIRECTORY = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'cache';
 
     /** Cache Time, in seconds.  4 days = 345600, 14 days = 1209600 */
     const CACHE_TIME = 1209600;
@@ -81,7 +88,7 @@ class Base
     public $template;
 
     /**
-     * @var Attogram\Justrefs\FilesystemCache
+     * @var Illuminate\Cache\Repository
      */
     protected $filesystem;
 
@@ -99,11 +106,6 @@ class Base
      * @var string - extraction source url
      */
     protected $source = 'https://en.wikipedia.org/wiki/';
-
-    /**
-     * @var string - path to cache directory
-     */
-    protected $cacheDirectory = '..' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR;
 
     /**
      * @var array - array of start times
@@ -231,7 +233,9 @@ class Base
 
     protected function initFilesystem()
     {
-        $this->filesystem = (new FilesystemCache())->init();
+        $this->filesystem = new Repository(
+            new FileStore(new Filesystem(), self::CACHE_DIRECTORY)
+        );
     }
 
     protected function initMediawiki()
