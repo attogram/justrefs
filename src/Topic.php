@@ -80,7 +80,7 @@ class Topic extends Base
             return false;
         }
 
-        $this->data = json_decode($this->data, true);
+        $this->data = json_decode($this->data, true); // @TODO catch errors from decode
 
         return true;
     }
