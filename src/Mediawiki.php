@@ -61,8 +61,10 @@ class Mediawiki extends Base
 
             return $result; // 404 Not Found
         }
-        // set title
-        $result[self::TITLE] = $data[self::PARSE][self::TITLE];
+
+       
+        $result['cached'] = time();  // set cache time
+        $result[self::TITLE] = $data[self::PARSE][self::TITLE]; // set title
         // set reference links
         $result[self::REFS] = isset($data[self::PARSE][self::EXTERNALLINKS])
             ? $data[self::PARSE][self::EXTERNALLINKS]
@@ -93,15 +95,16 @@ class Mediawiki extends Base
 
             return false;
         }
-        $results = [];
+        $result = [];
+        $result['cached'] = time();  // set cache time
         foreach ($data[self::QUERY][self::SEARCH] as $topic) {
             if (!isset($topic[self::TITLE]) || !is_string($topic[self::TITLE])) {
                 continue;
             }
-            $results[] = $topic[self::TITLE];
+            $result[] = $topic[self::TITLE];
         }
 
-        return $results;
+        return $result;
     }
 
     /**

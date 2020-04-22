@@ -40,7 +40,7 @@ class Topic extends Base
         $this->initFilesystem();
         
         if ($this->setDataFromCache()) { // get topic data from Cache
-            if (!empty($this->data['error'])) {
+            if (!empty($this->data['error'])) { // if cache contains error report (404)
                 $this->error404(self::ERROR_NOT_FOUND, $this->topic);
 
                 return;
@@ -108,13 +108,15 @@ class Topic extends Base
     
         // set Extraction source url
         $this->template->set('source', $this->source . $this->encodeLink($this->data[self::TITLE]));
-    
-        // set Data and Cache age
-        $filesystemCache = new FilesystemCache();
-        $this->template->set('dataAge', $filesystemCache->getAge($this->data[self::TITLE]));
-        $this->template->set('now', gmdate('Y-m-d H:i:s'));
+        $this->template->set('now', gmdate(self::DATE_FORMAT));
+
+        if (!isset($this->data['cached'])) {  // if no cache time is set...
+            $this->data['cached'] = time();
+        }
+        $this->template->set('cached', gmdate(self::DATE_FORMAT, $this->data['cached']));
+
         $this->template->set(
-            'refresh',
+            'refresh', // refresh link
             $this->template->get('home') . 'refresh/' . $this->encodeLink($this->data[self::TITLE])
         );
         $this->template->set('h1', $this->data[self::TITLE]);

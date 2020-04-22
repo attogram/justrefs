@@ -21,10 +21,12 @@ use function urldecode;
 
 class Base
 {
-    const VERSION = '0.6.2';
+    const VERSION = '0.7.0';
 
-    /** Cache Time, in seconds.  4 days = 345600 seconds */
-    const CACHE_TIME = 345600;
+    /** Cache Time, in seconds.  4 days = 345600, 14 days = 1209600 */
+    const CACHE_TIME = 1209600;
+
+    const DATE_FORMAT = 'Y-m-d H:i:s';
 
     /** key strings */
     const ABOUT = 'about';

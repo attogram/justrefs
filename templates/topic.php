@@ -24,7 +24,7 @@ $this->include('header');
     <a href="#draft"><b><?= $this->get('draft_count') ?></b> Drafts</a>,
     <a href="#user"><b><?= $this->get('user_count') ?></b> Users</a>
   </li>
-  <li>Cached <?= $this->get('dataAge') ?> UTC (<a href="<?= $this->get('refresh') ?>">refresh</a>)</li>
+  <li>Cached <?= $this->get('cached') ?> UTC (<a href="<?= $this->get('refresh') ?>">refresh</a>)</li>
   <li>Served <?= $this->get('now') ?> UTC</li>
   <li>Extracted from &lt;<a href="<?= $this->get('source') ?>" target="_blank"><?= $this->get('source') ?></a>&gt;
       released under the Creative Commons Attribution-Share-Alike License 3.0</li>
