@@ -72,7 +72,7 @@ class Topic extends Base
      */
     private function setDataFromCache()
     {
-        $this->data = $this->filesystem->get($this->topic);
+        $this->data = json_decode($this->filesystem->get($this->topic));
         if (!is_array($this->data)) {
             $this->data = [];
 
