@@ -12,6 +12,7 @@ use function count;
 use function gmdate;
 use function in_array;
 use function is_array;
+use function json_decode;
 use function json_encode;
 use function sort;
 use function substr;
@@ -72,12 +73,14 @@ class Topic extends Base
      */
     private function setDataFromCache()
     {
-        $this->data = json_decode($this->filesystem->get($this->topic));
-        if (!is_array($this->data)) {
+        $this->data = $this->filesystem->get($this->topic);
+        if (!$this->data) {
             $this->data = [];
 
             return false;
         }
+
+        $this->data = json_decode($this->data, true);
 
         return true;
     }
