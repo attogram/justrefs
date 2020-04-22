@@ -96,7 +96,7 @@ class Mediawiki extends Base
             return false;
         }
         $result = [];
-        $result['cached'] = time();  // set cache time
+        //$result['cached'] = time();  // @TODO set and use cache time
         foreach ($data[self::QUERY][self::SEARCH] as $topic) {
             if (!isset($topic[self::TITLE]) || !is_string($topic[self::TITLE])) {
                 continue;
