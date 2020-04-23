@@ -53,7 +53,7 @@ class JustRefs extends Base
                 (new Search($this->verbose, null, $this->template))->get($this->query);
                 break;
             case self::ABOUT:
-                $this->template->set('title', 'About this site');
+                $this->template->set(self::TITLE, 'About this site');
                 $this->template->include(self::ABOUT);
                 break;
             case self::REFRESH:
@@ -85,7 +85,7 @@ class JustRefs extends Base
         $this->template = new Template($this->verbose);
         $this->template->timer = $this->timer;
         $this->template->set(self::HOME, $this->router->getHome());
-        $this->template->set('title', $this->siteName);
+        $this->template->set(self::TITLE, $this->siteName);
         $this->template->set('name', $this->siteName);
         $this->template->set('version', self::VERSION);
     }

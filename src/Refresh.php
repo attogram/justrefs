@@ -25,7 +25,7 @@ class Refresh extends Base
         if (!$this->filesystem->has($this->topic)) { // does cache file exist?
             $this->error404('Cache File Not Found');
         }
-        $this->template->set('title', 'Refresh');
+        $this->template->set(self::TITLE, 'Refresh');
         if (empty($this->router->getPost())) {
             $this->ask();
 

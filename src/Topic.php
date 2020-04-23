@@ -234,7 +234,7 @@ class Topic extends Base
 
     private function setTemplates()
     {
-        foreach ($this->data['templates'] as $item) {
+        foreach ($this->data[self::TEMPLATES] as $item) {
             switch ($item[self::NS]) {
                 case '0': // Main
                     if ($item[self::ASTERISK] != $this->topic) {

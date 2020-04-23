@@ -53,7 +53,7 @@ class Search extends Base
             header('HTTP/1.0 404 Not Found');
             $this->searchResults = [];
         }
-        $this->template->set('title', 'search results - ' . $this->siteName);
+        $this->template->set(self::TITLE, 'search results - ' . $this->siteName);
         $this->template->include('html_head');
         $this->template->include('header');
         print '<div class="body"><b>' . count($this->searchResults) . '</b> results:<ol>';

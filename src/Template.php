@@ -29,7 +29,7 @@ class Template extends Base
      * @param string $name
      * @return bool
      */
-    public function include(string $name)
+    public function include(string $name): bool
     {
         $template = $this->templateDirectory . $name . '.php';
         if (!is_readable($template)) {
@@ -52,7 +52,7 @@ class Template extends Base
      * @param mixed $value
      * @return bool
      */
-    public function set(string $name, $value)
+    public function set(string $name, $value): bool
     {
         if (!is_string($name)) {
             return false;

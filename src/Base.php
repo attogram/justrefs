@@ -25,12 +25,12 @@ use function urldecode;
 
 class Base
 {
-    const VERSION = '0.8.0';
+    const VERSION = '0.8.1';
 
     /** Cache Directory */
     const CACHE_DIRECTORY = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'cache';
 
-    /** Cache Time, in seconds.  4 days = 345600, 14 days = 1209600 */
+    /** Cache Time, in seconds. 14 days = 1209600 seconds */
     const CACHE_TIME = 1209600;
 
     const DATE_FORMAT = 'Y-m-d H:i:s';
@@ -63,10 +63,10 @@ class Base
     const TEMPLATE = 'template';
     const TEMPLATE_TALK = 'template_talk';
     const TEMPLATE_SECONDARY = 'template_secondary';
+    const TEMPLATES = 'templates';
     const TITLE = 'title';
     const TOPIC = 'topic';
     const TOPICS = 'topics';
-    const TEMPLATES = 'templates';
     const USER = 'user';
     const USER_TALK = 'user_talk';
     const WIKIPEDIA = 'wikipedia';
