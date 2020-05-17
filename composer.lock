@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "attogram/file-cache-cleaner",
-            "version": "v2.3.0",
+            "version": "v2.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/attogram/file-cache-cleaner.git",
-                "reference": "94367a29f146bfc358f64203cef73a9a2f6d8454"
+                "reference": "2bd89f31c940a843be917f25882a595e89dd46ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/attogram/file-cache-cleaner/zipball/94367a29f146bfc358f64203cef73a9a2f6d8454",
-                "reference": "94367a29f146bfc358f64203cef73a9a2f6d8454",
+                "url": "https://api.github.com/repos/attogram/file-cache-cleaner/zipball/2bd89f31c940a843be917f25882a595e89dd46ec",
+                "reference": "2bd89f31c940a843be917f25882a595e89dd46ec",
                 "shasum": ""
             },
             "require": {
@@ -36,8 +36,8 @@
             "license": [
                 "MIT"
             ],
-            "description": "Delete expired Laravel-style `Illuminate\\Cache` cache files",
-            "time": "2020-05-16T14:03:47+00:00"
+            "description": "Delete expired Laravel-style `Illuminate\\Cache` cache files and empty directories",
+            "time": "2020-05-16T20:32:54+00:00"
         },
         {
             "name": "attogram/router",
