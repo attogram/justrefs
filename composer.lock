@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c7e05018dc751bb3db835724883649e1",
+    "content-hash": "fb59f0fe21190c723d6996ec61d9a212",
     "packages": [
         {
             "name": "attogram/file-cache-cleaner",
-            "version": "v2.4.0",
+            "version": "v2.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/attogram/file-cache-cleaner.git",
-                "reference": "0885c60b30697dc95589041940320674ed978797"
+                "reference": "877b1cb97b2ccb478f1472e4cb42598c1030a99f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/attogram/file-cache-cleaner/zipball/0885c60b30697dc95589041940320674ed978797",
-                "reference": "0885c60b30697dc95589041940320674ed978797",
+                "url": "https://api.github.com/repos/attogram/file-cache-cleaner/zipball/877b1cb97b2ccb478f1472e4cb42598c1030a99f",
+                "reference": "877b1cb97b2ccb478f1472e4cb42598c1030a99f",
                 "shasum": ""
             },
             "require": {
@@ -37,7 +37,7 @@
                 "MIT"
             ],
             "description": "Delete expired Laravel-style `Illuminate\\Cache` cache files and empty directories",
-            "time": "2020-05-17T19:49:52+00:00"
+            "time": "2020-05-18T12:47:24+00:00"
         },
         {
             "name": "attogram/router",
