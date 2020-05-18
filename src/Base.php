@@ -25,7 +25,7 @@ use function urldecode;
 
 class Base
 {
-    const VERSION = '0.8.1';
+    const VERSION = '0.8.2';
 
     /** Cache Directory */
     const CACHE_DIRECTORY = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'cache';
